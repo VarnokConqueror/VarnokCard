@@ -16,25 +16,29 @@
         <feDropShadow dx="0" dy="0" stdDeviation="6" flood-color="red" />
       </filter>
 
-      <!-- Full circle with larger radius for text placement -->
-      <path id="circlePath" d="M 100,10 A 90,90 0 1 1 99.99,10" />
+      <!-- Top Half Curve -->
+      <path id="topCurve" d="M 20,100 A 80,80 0 0 1 180,100" />
+
+      <!-- Bottom Half Curve -->
+      <path id="bottomCurve" d="M 20,100 A 80,80 0 0 0 180,100" />
     </defs>
 
     <!-- Top Curved Text -->
     <text fill="red" font-size="35" filter="url(#glow)">
-      <textPath href="#circlePath" startOffset="25%" text-anchor="middle">
+      <textPath href="#topCurve" startOffset="50%" text-anchor="middle">
         Through Power
       </textPath>
     </text>
 
     <!-- Bottom Curved Text -->
     <text fill="red" font-size="35" filter="url(#glow)">
-      <textPath href="#circlePath" startOffset="75%" text-anchor="middle">
+      <textPath href="#bottomCurve" startOffset="50%" text-anchor="middle">
         I Gain Victory
       </textPath>
     </text>
   </svg>
 </div>
+
 
       <div class="card-face card-back">
         <div class="qr-area" onclick="event.stopPropagation(); window.open('https://callup.luffa.im/p/9tx4rMVUJKb', '_blank');">
