@@ -16,29 +16,25 @@
         <feDropShadow dx="0" dy="0" stdDeviation="6" flood-color="red" />
       </filter>
 
-      <!-- Top curve: Left to right -->
-      <path id="topCurve" d="M 15,100 A 85,85 0 0 1 185,100" />
-
-      <!-- Bottom curve: same curve flipped vertically -->
-      <path id="bottomCurve" d="M 15,100 A 85,85 0 0 1 185,100" transform="scale(1, -1) translate(0, -200)" />
+      <!-- Full circle path -->
+      <path id="circlePath" d="M 100,15 A 85,85 0 1 1 99.99,15" />
     </defs>
 
     <!-- Top Curved Text -->
     <text fill="red" font-size="35" filter="url(#glow)">
-      <textPath href="#topCurve" startOffset="50%" text-anchor="middle">
+      <textPath href="#circlePath" startOffset="25%" text-anchor="middle">
         Through Power
       </textPath>
     </text>
 
     <!-- Bottom Curved Text -->
     <text fill="red" font-size="35" filter="url(#glow)">
-      <textPath href="#bottomCurve" startOffset="50%" text-anchor="middle">
+      <textPath href="#circlePath" startOffset="75%" text-anchor="middle">
         I Gain Victory
       </textPath>
     </text>
   </svg>
 </div>
-
 
       <div class="card-face card-back">
         <div class="qr-area" onclick="event.stopPropagation(); window.open('https://callup.luffa.im/p/9tx4rMVUJKb', '_blank');">
