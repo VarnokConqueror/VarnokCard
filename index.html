@@ -16,20 +16,22 @@
         <feDropShadow dx="0" dy="0" stdDeviation="6" flood-color="red" />
       </filter>
 
-      <!-- Path following approximate outer edge of your existing circle -->
+      <!-- Top Curve: Left to Right -->
       <path id="topCurve" d="M 20,100 A 80,80 0 0 1 180,100" />
-      <path id="bottomCurve" d="M 180,100 A 80,80 0 0 1 20,100" />
+
+      <!-- Bottom Curve: Left to Right (Reversed from your last one) -->
+      <path id="bottomCurve" d="M 20,100 A 80,80 0 0 1 180,100" />
     </defs>
 
     <!-- Top Curved Text -->
-    <text fill="red" font-size="12" filter="url(#glow)">
+    <text fill="red" font-size="14" filter="url(#glow)">
       <textPath href="#topCurve" startOffset="50%" text-anchor="middle">
         Through Power
       </textPath>
     </text>
 
     <!-- Bottom Curved Text -->
-    <text fill="red" font-size="12" filter="url(#glow)">
+    <text fill="red" font-size="14" filter="url(#glow)">
       <textPath href="#bottomCurve" startOffset="50%" text-anchor="middle">
         I Gain Victory
       </textPath>
