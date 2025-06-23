@@ -16,11 +16,11 @@
         <feDropShadow dx="0" dy="0" stdDeviation="6" flood-color="red" />
       </filter>
 
-      <!-- Top curve: across top half -->
+      <!-- Top curve: Left to right -->
       <path id="topCurve" d="M 15,100 A 85,85 0 0 1 185,100" />
 
-      <!-- Bottom curve: same arc direction, but positioned below -->
-      <path id="bottomCurve" d="M 15,100 A 85,85 0 0 1 185,100" transform="rotate(180,100,100)" />
+      <!-- Bottom curve: same curve flipped vertically -->
+      <path id="bottomCurve" d="M 15,100 A 85,85 0 0 1 185,100" transform="scale(1, -1) translate(0, -200)" />
     </defs>
 
     <!-- Top Curved Text -->
@@ -38,6 +38,7 @@
     </text>
   </svg>
 </div>
+
 
       <div class="card-face card-back">
         <div class="qr-area" onclick="event.stopPropagation(); window.open('https://callup.luffa.im/p/9tx4rMVUJKb', '_blank');">
