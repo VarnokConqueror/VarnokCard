@@ -16,28 +16,29 @@
         <feDropShadow dx="0" dy="0" stdDeviation="6" flood-color="red" />
       </filter>
 
-      <!-- Top curve across top half of the circle -->
+      <!-- Top curve -->
       <path id="topCurve" d="M 30,100 A 70,70 0 0 1 170,100" />
 
-      <!-- Bottom curve across bottom half of the circle -->
-      <path id="bottomCurve" d="M 170,100 A 70,70 0 0 1 30,100" />
+      <!-- Bottom curve (flipped horizontally to fix upside down) -->
+      <path id="bottomCurve" d="M 170,100 A 70,70 0 0 0 30,100" />
     </defs>
 
     <!-- Top Curved Text -->
-    <text fill="red" font-size="18" filter="url(#glow)">
+    <text fill="red" font-size="28" filter="url(#glow)">
       <textPath href="#topCurve" startOffset="50%" text-anchor="middle">
         Through Power
       </textPath>
     </text>
 
     <!-- Bottom Curved Text -->
-    <text fill="red" font-size="18" filter="url(#glow)">
+    <text fill="red" font-size="28" filter="url(#glow)">
       <textPath href="#bottomCurve" startOffset="50%" text-anchor="middle">
         I Gain Victory
       </textPath>
     </text>
   </svg>
 </div>
+
       <div class="card-face card-back">
         <div class="qr-area" onclick="event.stopPropagation(); window.open('https://callup.luffa.im/p/9tx4rMVUJKb', '_blank');">
           <span class="click-text">CLICK HERE</span>
