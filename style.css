@@ -8,10 +8,11 @@ body {
 .card-container {
   width: 350px;
   height: 220px;
-  position: absolute;
+  position: fixed;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
+  margin-left: -175px;
+  margin-top: -110px;
   perspective: 1200px;
 }
 
