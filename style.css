@@ -66,3 +66,16 @@ body {
   font-weight: bold;
   text-shadow: 0 0 5px black;
 }
+
+.rune-circle {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  border: 2px solid red;
+  box-shadow: 0 0 15px red;
+  animation: pulse 2s infinite;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
