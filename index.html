@@ -8,10 +8,25 @@
 <body>
   <div class="card-container">
     <div class="card" onclick="flipCard(this)">
-     <div class="card-face card-front">
-  <div class="rune-circle">
-    <div class="victory-text">Through Power I Gain Victory</div>
-  </div>
+    <div class="card-face card-front">
+  <svg class="rune-svg" viewBox="0 0 200 200">
+    <defs>
+      <path id="topCurve" d="M 20,100 A 80,80 0 0 1 180,100" />
+      <path id="bottomCurve" d="M 180,100 A 80,80 0 0 1 20,100" />
+    </defs>
+    
+    <text class="rune-text">
+      <textPath href="#topCurve" startOffset="50%" text-anchor="middle">
+        Through Power I Gain
+      </textPath>
+    </text>
+    
+    <text class="rune-text">
+      <textPath href="#bottomCurve" startOffset="50%" text-anchor="middle">
+        Victory
+      </textPath>
+    </text>
+  </svg>
 </div>
       <div class="card-face card-back">
         <div class="qr-area" onclick="event.stopPropagation(); window.open('https://callup.luffa.im/p/9tx4rMVUJKb', '_blank');">
