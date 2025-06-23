@@ -39,6 +39,7 @@ body {
 
 .card-front {
   background-image: url('assets/front.png');
+  position: relative;
 }
 
 .card-back {
@@ -64,54 +65,10 @@ body {
   color: red;
   font-size: 18px;
   font-weight: bold;
-  text-shadow: 0 0 5px black;
-}
-
-.rune-circle {
-  width: 150px;
-  height: 150px;
-  border-radius: 50%;
-  border: 2px solid red;
-  box-shadow: 0 0 15px red;
-  animation: pulse 2s infinite;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-}
-
-.victory-text {
-  color: red;
-  font-size: 14px;
-  text-align: center;
   text-shadow: 
     0 0 5px red,
     0 0 10px red,
-    0 0 20px red,
-    0 0 40px red;
-  animation: glowPulse 2s infinite;
-}
-
-@keyframes glowPulse {
-  0%, 100% {
-    text-shadow: 
-      0 0 5px red,
-      0 0 10px red,
-      0 0 20px red,
-      0 0 40px red;
-  }
-  50% {
-    text-shadow: 
-      0 0 10px red,
-      0 0 20px red,
-      0 0 40px red,
-      0 0 60px red;
-  }
+    0 0 20px red;
 }
 
 .rune-svg {
@@ -122,16 +79,3 @@ body {
   width: 150px;
   height: 150px;
 }
-
-.rune-text {
-  fill: red;
-  font-size: 12px;
-  text-shadow: 
-    0 0 5px red,
-    0 0 10px red,
-    0 0 20px red,
-    0 0 40px red;
-  animation: glowPulse 2s infinite;
-}
-
-
