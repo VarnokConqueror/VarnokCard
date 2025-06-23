@@ -8,31 +8,35 @@
 <body>
   <div class="card-container">
     <div class="card" onclick="flipCard(this)">
-   <div class="card-face card-front">
+<div class="card-face card-front">
   <svg class="rune-svg" viewBox="0 0 200 200">
     <defs>
       <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
         <feDropShadow dx="0" dy="0" stdDeviation="3" flood-color="red" />
         <feDropShadow dx="0" dy="0" stdDeviation="6" flood-color="red" />
       </filter>
-      <path id="topCurve" d="M 100,20 A 80,80 0 0 1 180,100" />
-      <path id="bottomCurve" d="M 180,100 A 80,80 0 0 1 100,180 A 80,80 0 0 1 20,100" />
+
+      <!-- Top Half Curve -->
+      <path id="topCurve" d="M 20,100 A 80,80 0 0 1 180,100" />
+
+      <!-- Bottom Half Curve -->
+      <path id="bottomCurve" d="M 180,100 A 80,80 0 0 1 20,100" />
     </defs>
 
-    <!-- Circle -->
+    <!-- Circle Outline -->
     <circle cx="100" cy="100" r="80" stroke="red" stroke-width="2" fill="none" filter="url(#glow)" />
 
     <!-- Top Curved Text -->
     <text fill="red" font-size="12" filter="url(#glow)">
       <textPath href="#topCurve" startOffset="50%" text-anchor="middle">
-        Through Power I Gain
+        Through Power
       </textPath>
     </text>
 
     <!-- Bottom Curved Text -->
     <text fill="red" font-size="12" filter="url(#glow)">
       <textPath href="#bottomCurve" startOffset="50%" text-anchor="middle">
-        Victory
+        I Gain Victory
       </textPath>
     </text>
   </svg>
