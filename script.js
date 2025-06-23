@@ -13,7 +13,6 @@ function flipCard(container) {
   card.classList.toggle('flipped');
 }
 
-// Prevent QR area from triggering flip
 document.addEventListener('DOMContentLoaded', () => {
   const qr = document.querySelector('.qr-area');
   qr.addEventListener('click', e => {

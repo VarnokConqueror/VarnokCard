@@ -43,7 +43,6 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  flex-direction: column;
 }
 .card-front {
   background-image: url('assets/front.png');
@@ -51,6 +50,15 @@ body {
 .card-back {
   background-image: url('assets/back.png');
   transform: rotateY(180deg);
+}
+.rune-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 .rune-circle {
   width: 150px;
@@ -85,7 +93,6 @@ body {
   font-weight: bold;
   text-shadow: 0 0 5px black;
 }
-
 @keyframes pulse {
   0%, 100% {
     box-shadow: 0 0 10px red;
