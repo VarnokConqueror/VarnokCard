@@ -15,7 +15,7 @@ body {
   max-width: 400px;
   aspect-ratio: 16 / 10;
   margin: 100px auto;
-  perspective: 1000px;
+  perspective: 1200px;
   position: relative;
   z-index: 1;
 }
@@ -24,11 +24,12 @@ body {
   height: 100%;
   position: relative;
   transform-style: preserve-3d;
-  transition: transform 0.8s ease;
+  transition: transform 0.8s ease, filter 0.4s ease;
   cursor: pointer;
 }
 .card.flipped {
   transform: rotateY(180deg);
+  filter: brightness(1.2) saturate(1.2);
 }
 .card-face {
   position: absolute;
@@ -42,6 +43,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
 }
 .card-front {
   background-image: url('assets/front.png');
@@ -49,6 +51,21 @@ body {
 .card-back {
   background-image: url('assets/back.png');
   transform: rotateY(180deg);
+}
+.rune-circle {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  border: 2px solid red;
+  box-shadow: 0 0 15px red;
+  animation: pulse 2s infinite;
+}
+.victory-text {
+  color: red;
+  font-size: 16px;
+  margin-top: 10px;
+  text-align: center;
+  text-shadow: 0 0 10px black;
 }
 .qr-area {
   position: absolute;
@@ -67,4 +84,13 @@ body {
   font-size: 18px;
   font-weight: bold;
   text-shadow: 0 0 5px black;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 0 10px red;
+  }
+  50% {
+    box-shadow: 0 0 25px red;
+  }
 }

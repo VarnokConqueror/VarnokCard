@@ -2,16 +2,19 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>VARNOK | Flip Card</title>
+  <title>VARNOK | Rune Flip Card</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div id="particles-js"></div>
-  <div class="card-container" onclick="flipCard(this)">
-    <div class="card">
-      <div class="card-face card-front"></div>
+  <div class="card-container">
+    <div class="card" onclick="flipCard(this)">
+      <div class="card-face card-front">
+        <div class="rune-circle"></div>
+        <div class="victory-text">Through Power I Gain Victory</div>
+      </div>
       <div class="card-face card-back">
-        <div class="qr-area" onclick="window.open('https://callup.luffa.im/p/9tx4rMVUJKb', '_blank')">
+        <div class="qr-area">
           <span class="click-text">CLICK HERE</span>
         </div>
       </div>
