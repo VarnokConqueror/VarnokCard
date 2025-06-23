@@ -16,22 +16,22 @@
         <feDropShadow dx="0" dy="0" stdDeviation="6" flood-color="red" />
       </filter>
 
-      <!-- Top curve -->
-      <path id="topCurve" d="M 30,100 A 70,70 0 0 1 170,100" />
+      <!-- Top curve: wider, hugs near outer edge -->
+      <path id="topCurve" d="M 15,100 A 85,85 0 0 1 185,100" />
 
-      <!-- Bottom curve (flipped horizontally to fix upside down) -->
-      <path id="bottomCurve" d="M 170,100 A 70,70 0 0 0 30,100" />
+      <!-- Bottom curve: reversed properly -->
+      <path id="bottomCurve" d="M 185,100 A 85,85 0 0 1 15,100" />
     </defs>
 
     <!-- Top Curved Text -->
-    <text fill="red" font-size="28" filter="url(#glow)">
+    <text fill="red" font-size="40" filter="url(#glow)">
       <textPath href="#topCurve" startOffset="50%" text-anchor="middle">
         Through Power
       </textPath>
     </text>
 
     <!-- Bottom Curved Text -->
-    <text fill="red" font-size="28" filter="url(#glow)">
+    <text fill="red" font-size="40" filter="url(#glow)">
       <textPath href="#bottomCurve" startOffset="50%" text-anchor="middle">
         I Gain Victory
       </textPath>
