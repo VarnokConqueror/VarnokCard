@@ -2,17 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>VARNOK | Rune Flip Card</title>
+  <title>VARNOK | Bare Flip Card</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div id="particles-js"></div>
   <div class="card-container">
     <div class="card" onclick="flipCard(this)">
-      <div class="card-face card-front">
-        <div class="rune-circle"></div>
-        <div class="victory-text">Through Power I Gain Victory</div>
-      </div>
+      <div class="card-face card-front"></div>
       <div class="card-face card-back">
         <div class="qr-area" onclick="event.stopPropagation(); window.open('https://callup.luffa.im/p/9tx4rMVUJKb', '_blank');">
           <span class="click-text">CLICK HERE</span>
@@ -20,8 +16,6 @@
       </div>
     </div>
   </div>
-  <script src="https://cdn.jsdelivr.net/npm/particles.js"></script>
   <script src="script.js"></script>
-  <script src="assets/particles.js"></script>
 </body>
 </html>
