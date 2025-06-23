@@ -46,9 +46,8 @@ body {
 }
 
 .card-back {
-  background-image: url('assets/back.png');
   transform: rotateY(180deg);
-  position: relative;
+  backface-visibility: hidden;
 }
 
 .qr-area {
