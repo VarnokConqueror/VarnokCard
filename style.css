@@ -35,7 +35,6 @@ body {
   height: 100%;
   backface-visibility: hidden;
   border-radius: 20px;
-  transform-style: preserve-3d;
   overflow: hidden;
   background-size: cover;
   background-position: center;
@@ -47,8 +46,9 @@ body {
 }
 
 .card-back {
+  background-image: url('assets/back.png');
   transform: rotateY(180deg);
-  backface-visibility: hidden;
+  position: relative;
 }
 
 .qr-area {
