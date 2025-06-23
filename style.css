@@ -79,3 +79,15 @@ body {
   left: 50%;
   transform: translate(-50%, -50%);
 }
+
+.victory-text {
+  color: red;
+  font-size: 16px;
+  text-align: center;
+  text-shadow: 0 0 10px black;
+  position: absolute;
+  top: calc(50% + 90px); /* 50% vertically + offset for rune */
+  left: 50%;
+  transform: translateX(-50%);
+  animation: pulse 2s infinite;
+}
