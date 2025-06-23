@@ -6,9 +6,8 @@ body {
 }
 
 .card-container {
-  width: 90vw;
-  max-width: 400px;
-  aspect-ratio: 16 / 10;
+  width: 350px;
+  height: 220px;
   position: absolute;
   top: 50%;
   left: 50%;
