@@ -21,8 +21,10 @@
       <feDropShadow dx="0" dy="0" stdDeviation="6" flood-color="red"/>
     </filter>
     <!-- Make top/bottom arcs much tighter and higher/lower -->
-    <path id="topCurve" d="M 410,310 A 170,170 0 0 1 702,310"/>
-    <path id="bottomCurve" d="M 410,355 A 170,170 0 0 0 702,355"/>
+   <!-- Move TOP phrase UP: lower Y value (from 310 to 295) -->
+      <path id="topCurve" d="M 410,295 A 170,170 0 0 1 702,295"/>
+<!-- Move BOTTOM phrase DOWN: higher Y value (from 355 to 375) -->
+      <path id="bottomCurve" d="M 410,375 A 170,170 0 0 0 702,375"/>
   </defs>
   <circle cx="556" cy="331" r="210"
           stroke="red" stroke-width="3" fill="none"
