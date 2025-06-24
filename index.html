@@ -15,30 +15,30 @@
       <div class="card-face card-front">
         <img src="assets/front.png" class="card-img">
         <svg class="rune-svg" viewBox="0 0 1112 662">
-          <defs>
-            <filter id="glow" x="-50%" y="-50%" width="225%" height="225%">
-              <feDropShadow dx="0" dy="0" stdDeviation="3" flood-color="red"/>
-              <feDropShadow dx="0" dy="0" stdDeviation="6" flood-color="red"/>
-            </filter>
-            <!-- Return to radius 230 for perfect fit -->
-            <path id="topCurve"    d="M 326,331 A 230,230 0 0 1 786,331"/>
-            <path id="bottomCurve" d="M 326,331 A 230,230 0 0 0 786,331"/>
-          </defs>
-          <circle cx="556" cy="331" r="230"
-                  stroke="red" stroke-width="3" fill="none"
-                  filter="url(#glow)" class="pulsing-glow"/>
-          <!-- Increase font-size to 60 for maximum impact, inside circle -->
-          <text fill="red" font-size="60" filter="url(#glow)" class="pulsing-glow">
-            <textPath href="#topCurve" startOffset="50%" text-anchor="middle">
-              Through Power
-            </textPath>
-          </text>
-          <text fill="red" font-size="60" filter="url(#glow)" class="pulsing-glow">
-            <textPath href="#bottomCurve" startOffset="50%" text-anchor="middle">
-              I Gain Victory
-            </textPath>
-          </text>
-        </svg>
+  <defs>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="0" stdDeviation="3" flood-color="red"/>
+      <feDropShadow dx="0" dy="0" stdDeviation="6" flood-color="red"/>
+    </filter>
+    <!-- Path radius 200 for text, circle is 230 for visible border -->
+    <path id="topCurve" d="M 356,331 A 200,200 0 0 1 756,331"/>
+    <path id="bottomCurve" d="M 356,331 A 200,200 0 0 0 756,331"/>
+  </defs>
+  <circle cx="556" cy="331" r="230"
+          stroke="red" stroke-width="3" fill="none"
+          filter="url(#glow)" class="pulsing-glow"/>
+  <text fill="red" font-size="60" filter="url(#glow)" class="pulsing-glow">
+    <textPath href="#topCurve" startOffset="50%" text-anchor="middle">
+      Through Power
+    </textPath>
+  </text>
+  <text fill="red" font-size="60" filter="url(#glow)" class="pulsing-glow">
+    <textPath href="#bottomCurve" startOffset="50%" text-anchor="middle">
+      I Gain Victory
+    </textPath>
+  </text>
+</svg>
+
       </div>
 
       <!-- BACK FACE -->
