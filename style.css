@@ -3,19 +3,22 @@ body {
   background: black;
   overflow: hidden;
   font-family: sans-serif;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
 }
-
+#particles-js {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
 .card-container {
   width: 90vw;
-  max-width: 600px;
-  aspect-ratio: 1112 / 662;
-  perspective: 1200px;
+  max-width: 400px;
+  aspect-ratio: 16 / 10;
+  margin: 100px auto;
+  perspective: 1000px;
+  position: relative;
+  z-index: 1;
 }
-
 .card {
   width: 100%;
   height: 100%;
@@ -24,11 +27,9 @@ body {
   transition: transform 0.8s ease;
   cursor: pointer;
 }
-
 .card.flipped {
   transform: rotateY(180deg);
 }
-
 .card-face {
   position: absolute;
   width: 100%;
@@ -36,30 +37,23 @@ body {
   backface-visibility: hidden;
   border-radius: 20px;
   overflow: hidden;
-}
-
-.card-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.card-front, .card-back {
+  background-size: cover;
+  background-position: center;
   display: flex;
-  align-items: center;
   justify-content: center;
-  position: relative;
+  align-items: center;
 }
-
+.card-front {
+  background-image: url('assets/front.png');
+}
 .card-back {
+  background-image: url('assets/back.png');
   transform: rotateY(180deg);
 }
-
 .qr-area {
   position: absolute;
-  width: 25%;
-  aspect-ratio: 1;
+  width: 120px;
+  height: 120px;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -68,61 +62,24 @@ body {
   justify-content: center;
   align-items: center;
 }
-
 .click-text {
   color: red;
-  font-size: 2vw;
+  font-size: 18px;
   font-weight: bold;
-  text-shadow: 
-    0 0 5px red,
-    0 0 10px red,
-    0 0 20px red;
-}
-
-.rune-svg {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
+  text-shadow: 0 0 5px black;
 }
 
 @keyframes glowPulse {
   0%, 100% {
     stroke-width: 3;
-    filter: url(#glow);
     opacity: 1;
   }
   50% {
     stroke-width: 5;
-    filter: url(#glow);
     opacity: 0.7;
-  }
-}
-
-@keyframes floatIn {
-  0% {
-    transform: translateY(-100px);
-    opacity: 0;
-  }
-  100% {
-    transform: translateY(0);
-    opacity: 1;
   }
 }
 
 .pulsing-glow {
   animation: glowPulse 2s infinite;
-}
-
-.floating-varnok {
-  position: fixed;
-  top: 5vh;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 4vw;
-  color: red;
-  text-shadow: 0 0 10px red, 0 0 20px red;
-  animation: floatIn 1.5s ease-out;
-  z-index: 2;
 }

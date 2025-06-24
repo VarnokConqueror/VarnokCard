@@ -1,60 +1,49 @@
-<div class="card-container" onclick="flipCard(this)">
-  <div class="card">
-
-    <div id="particles-js"></div>
-
-<h1 class="floating-varnok">VARNOK</h1>
-
-<div class="card-container" onclick="flipCard(this)">
-  <div class="card">
-    <!-- Front & Back as we've built them -->
-  </div>
-</div>
-    
-    <!-- FRONT -->
-   <div class="card-face card-front">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>VARNOK | Flip Card</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="particles-js"></div>
+  <div class="card-container" onclick="flipCard(this)">
+    <div class="card">
+      
+<div class="card-face card-front">
   <img src="assets/front.png" class="card-img">
-  
   <svg class="rune-svg" viewBox="0 0 1112 662">
     <defs>
       <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
         <feDropShadow dx="0" dy="0" stdDeviation="3" flood-color="red" />
         <feDropShadow dx="0" dy="0" stdDeviation="6" flood-color="red" />
       </filter>
+      <path id="topCurve" d="M 326,331 A 230,230 0 0 1 786,331" />
+      <path id="bottomCurve" d="M 326,331 A 230,230 0 0 0 786,331" />
     </defs>
-
-    <!-- Glowing Rune Circle -->
     <circle cx="556" cy="331" r="230" stroke="red" stroke-width="3" fill="none" filter="url(#glow)" class="pulsing-glow"/>
-
-    <!-- Top Curved Text -->
     <text fill="red" font-size="30" filter="url(#glow)">
       <textPath href="#topCurve" startOffset="50%" text-anchor="middle">
         Through Power
       </textPath>
     </text>
-
-    <!-- Bottom Curved Text -->
     <text fill="red" font-size="30" filter="url(#glow)">
       <textPath href="#bottomCurve" startOffset="50%" text-anchor="middle">
         I Gain Victory
       </textPath>
     </text>
-
-    <!-- Top and Bottom Paths -->
-    <defs>
-      <path id="topCurve" d="M 326,331 A 230,230 0 0 1 786,331" />
-      <path id="bottomCurve" d="M 326,331 A 230,230 0 0 0 786,331" />
-    </defs>
   </svg>
 </div>
 
-    <!-- BACK -->
-    <div class="card-face card-back">
-      <img src="assets/back.png" alt="Back" class="card-img">
-      <div class="qr-area" onclick="window.open('https://callup.luffa.im/p/9tx4rMVUJKb', '_blank'); event.stopPropagation();">
-        <span class="click-text">CLICK HERE</span>
+      <div class="card-face card-back">
+        <div class="qr-area" onclick="window.open('https://callup.luffa.im/p/9tx4rMVUJKb', '_blank')">
+          <span class="click-text">CLICK HERE</span>
+        </div>
       </div>
     </div>
-
   </div>
-</div>
+  <script src="https://cdn.jsdelivr.net/npm/particles.js"></script>
+  <script src="script.js"></script>
+  <script src="assets/particles.js"></script>
+</body>
+</html>
