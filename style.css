@@ -4,28 +4,24 @@ body {
   overflow: hidden;
   font-family: sans-serif;
 }
+
 #particles-js {
   position: fixed;
   width: 100%;
   height: 100%;
   z-index: 0;
 }
+
 .card-container {
   width: 90vw;
-  max-width: 400px;
-  aspect-ratio: 16 / 10;
-  margin: 100px auto;
+  max-width: 600px;
+  aspect-ratio: 1112 / 662;
   perspective: 1000px;
   position: relative;
   z-index: 1;
 }
-.card-img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  display: block;
-}
 
+.card {
   width: 100%;
   height: 100%;
   position: relative;
@@ -33,9 +29,11 @@ body {
   transition: transform 0.8s ease;
   cursor: pointer;
 }
+
 .card.flipped {
   transform: rotateY(180deg);
 }
+
 .card-face {
   position: absolute;
   width: 100%;
@@ -43,19 +41,22 @@ body {
   backface-visibility: hidden;
   border-radius: 20px;
   overflow: hidden;
-  background-size: cover;
-  background-position: center;
   display: flex;
   justify-content: center;
   align-items: center;
 }
-.card-front {
-  background-image: url('assets/front.png');
-}
+
 .card-back {
-  background-image: url('assets/back.png');
   transform: rotateY(180deg);
 }
+
+.card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
 .qr-area {
   position: absolute;
   width: 120px;
@@ -68,6 +69,7 @@ body {
   justify-content: center;
   align-items: center;
 }
+
 .click-text {
   color: red;
   font-size: 18px;
@@ -76,8 +78,14 @@ body {
 }
 
 @keyframes glowPulse {
-  0%,100% { stroke-width:3; opacity:1; }
-  50%    { stroke-width:5; opacity:0.7; }
+  0%, 100% {
+    stroke-width: 3;
+    opacity: 1;
+  }
+  50% {
+    stroke-width: 5;
+    opacity: 0.7;
+  }
 }
 
 .pulsing-glow {
