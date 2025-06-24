@@ -76,19 +76,14 @@ body {
 }
 
 @keyframes glowPulse {
-  0%, 100% {
-    stroke-width: 3;
-    opacity: 1;
-  }
-  50% {
-    stroke-width: 5;
-    opacity: 0.7;
-  }
+  0%,100% { stroke-width:3; opacity:1; }
+  50%    { stroke-width:5; opacity:0.7; }
 }
 
 .pulsing-glow {
   animation: glowPulse 2s infinite;
 }
+
 .click-note {
   position: absolute;
   right: 5%;
