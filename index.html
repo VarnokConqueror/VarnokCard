@@ -14,14 +14,15 @@
       <!-- FRONT FACE -->
       <div class="card-face card-front">
         <img src="assets/front.png" class="card-img">
-        <svg class="rune-svg" viewBox="0 0 1112 662">
+        '<svg class="rune-svg" viewBox="0 0 1112 662">
   <defs>
     <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
       <feDropShadow dx="0" dy="0" stdDeviation="3" flood-color="red"/>
       <feDropShadow dx="0" dy="0" stdDeviation="6" flood-color="red"/>
     </filter>
-    <!-- Path radius 200 for text, circle is 230 for visible border -->
-    <path id="topCurve" d="M 356,331 A 150,150 0 0 1 756,331"/>
+    <!-- TOP ARC: Move endpoints closer, use r=150 -->
+    <path id="topCurve" d="M 406,331 A 150,150 0 0 1 706,331"/>
+    <!-- BOTTOM ARC: Leave as you like (looks good!) -->
     <path id="bottomCurve" d="M 356,331 A 200,200 0 0 0 756,331"/>
   </defs>
   <circle cx="556" cy="331" r="210"
@@ -38,6 +39,7 @@
     </textPath>
   </text>
 </svg>
+
 
       </div>
 
