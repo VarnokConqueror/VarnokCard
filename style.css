@@ -3,6 +3,10 @@ body {
   background: black;
   overflow: hidden;
   font-family: sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
 }
 
 #particles-js {
@@ -19,6 +23,9 @@ body {
   perspective: 1000px;
   position: relative;
   z-index: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .card {
@@ -30,7 +37,7 @@ body {
   cursor: pointer;
 }
 
-.card.flipped {
+.card-container.flipped .card {
   transform: rotateY(180deg);
 }
 
@@ -57,6 +64,28 @@ body {
   display: block;
 }
 
+.rune-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+@keyframes glowPulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.pulsing-glow {
+  animation: glowPulse 2s infinite;
+}
+
 .qr-area {
   position: absolute;
   width: 120px;
@@ -77,24 +106,9 @@ body {
   text-shadow: 0 0 5px black;
 }
 
-@keyframes glowPulse {
-  0%, 100% {
-    stroke-width: 3;
-    opacity: 1;
-  }
-  50% {
-    stroke-width: 5;
-    opacity: 0.7;
-  }
-}
-
-.pulsing-glow {
-  animation: glowPulse 2s infinite;
-}
-
 .click-note {
-  position: absolute;
-  right: 5%;
+  position: fixed;
+  left: calc(50% + 320px);
   top: 50%;
   transform: translateY(-50%);
   color: red;
@@ -103,5 +117,11 @@ body {
     0 0 5px red,
     0 0 10px red,
     0 0 20px red;
+  transition: opacity 0.3s ease;
   pointer-events: none;
+}
+
+.card-container.flipped ~ .click-note {
+  opacity: 0;
+  visibility: hidden;
 }
