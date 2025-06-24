@@ -14,21 +14,20 @@
       <!-- FRONT FACE -->
       <div class="card-face card-front">
         <img src="assets/front.png" class="card-img">
-        '<svg class="rune-svg" viewBox="0 0 1112 662">
+        <svg class="rune-svg" viewBox="0 0 1112 662">
   <defs>
     <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
       <feDropShadow dx="0" dy="0" stdDeviation="3" flood-color="red"/>
       <feDropShadow dx="0" dy="0" stdDeviation="6" flood-color="red"/>
     </filter>
-    <!-- TOP ARC: Move endpoints closer, use r=170 -->
-    <path id="topCurve" d="M 406,250 A 150,150 0 0 1 706,250"/>
-    <!-- BOTTOM ARC: Leave as you like (looks good!) -->
-    <path id="bottomCurve" d="M 300,425 A 250,250 0 0 0 810,425"/>
+    <!-- Make top/bottom arcs much tighter and higher/lower -->
+    <path id="topCurve" d="M 430,280 A 130,130 0 0 1 682,280"/>
+    <path id="bottomCurve" d="M 430,382 A 130,130 0 0 0 682,382"/>
   </defs>
   <circle cx="556" cy="331" r="210"
           stroke="red" stroke-width="3" fill="none"
           filter="url(#glow)" class="pulsing-glow"/>
-  <text fill="red" font-size="60" filter="url(#glow)" class="pulsing-glow">
+  <text fill="red" font-size="55" filter="url(#glow)" class="pulsing-glow">
     <textPath href="#topCurve" startOffset="50%" text-anchor="middle">
       Through Power
     </textPath>
