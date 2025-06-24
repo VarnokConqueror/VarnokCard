@@ -20,18 +20,20 @@
               <feDropShadow dx="0" dy="0" stdDeviation="3" flood-color="red"/>
               <feDropShadow dx="0" dy="0" stdDeviation="6" flood-color="red"/>
             </filter>
-            <path id="topCurve"    d="M 356,331 A 200,200 0 0 1 756,331"/>
-            <path id="bottomCurve" d="M 356,331 A 200,200 0 0 0 756,331"/>
+            <!-- Bigger circle radius 250 for rune -->
+            <path id="topCurve"    d="M 306,331 A 250,250 0 0 1 806,331"/>
+            <path id="bottomCurve" d="M 306,331 A 250,250 0 0 0 806,331"/>
           </defs>
-          <circle cx="556" cy="331" r="200"
+          <circle cx="556" cy="331" r="250"
                   stroke="red" stroke-width="3" fill="none"
                   filter="url(#glow)" class="pulsing-glow"/>
-          <text fill="red" font-size="32" filter="url(#glow)" class="pulsing-glow">
+          <!-- Text size increased to 50, inside the circle -->
+          <text fill="red" font-size="50" filter="url(#glow)" class="pulsing-glow">
             <textPath href="#topCurve" startOffset="50%" text-anchor="middle">
               Through Power
             </textPath>
           </text>
-          <text fill="red" font-size="32" filter="url(#glow)" class="pulsing-glow">
+          <text fill="red" font-size="50" filter="url(#glow)" class="pulsing-glow">
             <textPath href="#bottomCurve" startOffset="50%" text-anchor="middle">
               I Gain Victory
             </textPath>
