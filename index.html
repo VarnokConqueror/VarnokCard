@@ -1,15 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>VARNOK | Flip Card</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <title>VARNOK | Flip Card</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div id="particles-js"></div>
 
   <div class="card-container" onclick="flipCard(this)">
     <div class="card">
+
       <!-- FRONT FACE -->
       <div class="card-face card-front">
         <img src="assets/front.png" class="card-img">
@@ -22,7 +23,9 @@
             <path id="topCurve" d="M 326,331 A 230,230 0 0 1 786,331"/>
             <path id="bottomCurve" d="M 326,331 A 230,230 0 0 0 786,331"/>
           </defs>
-          <circle cx="556" cy="331" r="230" stroke="red" stroke-width="3" fill="none" filter="url(#glow)" class="pulsing-glow"/>
+          <circle cx="556" cy="331" r="230"
+                  stroke="red" stroke-width="3" fill="none"
+                  filter="url(#glow)" class="pulsing-glow"/>
           <text fill="red" font-size="30" filter="url(#glow)" class="pulsing-glow">
             <textPath href="#topCurve" startOffset="50%" text-anchor="middle">
               Through Power
@@ -35,6 +38,7 @@
           </text>
         </svg>
       </div>
+
       <!-- BACK FACE -->
       <div class="card-face card-back">
         <img src="assets/back.png" class="card-img">
@@ -42,18 +46,18 @@
           <span class="click-text">CLICK HERE</span>
         </div>
       </div>
-    </div>
-  </div>
 
-  <div class="click-note">&larr; CLICK HERE</div>
+    </div>
+    <div class="click-note">&larr; CLICK HERE</div>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/particles.js"></script>
   <script src="assets/particles.js"></script>
   <script>
     function flipCard(container) {
       const isFlipped = container.classList.toggle('flipped');
-      const sound = isFlipped ? 'assets/flip-forward.wav' : 'assets/flip-back.wav';
-      new Audio(sound).play();
+      const soundFile = isFlipped ? 'assets/flip-forward.wav' : 'assets/flip-back.wav';
+      new Audio(soundFile).play();
     }
   </script>
 </body>
