@@ -21,32 +21,32 @@
       <feDropShadow dx="0" dy="0" stdDeviation="6" flood-color="red"/>
     </filter>
 
-    <!-- Adjusted arc paths -->
-    <path id="topCurve" d="M 394,340 A 162,162 0 0 1 718,338" />
+    <!-- Adjusted arcs inside the circle -->
+    <path id="topCurve" d="M 388,343 A 168,168 0 0 1 724,338" />
     <path id="bottomCurve" d="M 376,355 A 170,170 0 0 0 736,355" />
   </defs>
 
-  <!-- Glowing circle -->
+  <!-- Glowing border circle -->
   <circle cx="556" cy="331" r="210"
           stroke="red" stroke-width="3" fill="none"
           filter="url(#glow)" class="pulsing-glow"/>
 
-  <!-- Top text: Through Power -->
-  <text fill="red" font-size="55" filter="url(#glow)" class="pulsing-glow">
-  <textPath href="#topCurve" startOffset="50%" text-anchor="middle" textLength="410">
-  Th<tspan dy="-2">roug</tspan><tspan dy="-1.5">h</tspan> <tspan dy="-1.5">P</tspan>ower
-</textPath>
-</text>
+  <!-- Top phrase: Through Power -->
+  <text fill="red" font-size="55" filter="url(#glow)" class="pulsing-glow"
+        textLength="390" lengthAdjust="spacing">
+    <textPath href="#topCurve" startOffset="50%" text-anchor="middle">
+      Through Power
+    </textPath>
+  </text>
 
-  <!-- Bottom text: I Gain Victory -->
-  <text fill="red" font-size="55" filter="url(#glow)" class="pulsing-glow">
-  <textPath href="#bottomCurve" startOffset="50%" text-anchor="middle" textLength="460">
-    I Gain Victory
-  </textPath>
-</text>
-  </svg>
-
-
+  <!-- Bottom phrase: I Gain Victory -->
+  <text fill="red" font-size="55" filter="url(#glow)" class="pulsing-glow"
+        textLength="420" lengthAdjust="spacing">
+    <textPath href="#bottomCurve" startOffset="50%" text-anchor="middle">
+      I Gain Victory
+    </textPath>
+  </text>
+</svg>
       </div>
 
       <!-- BACK FACE -->
