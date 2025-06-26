@@ -21,9 +21,10 @@
       <feDropShadow dx="0" dy="0" stdDeviation="6" flood-color="red"/>
     </filter>
 
-    <!-- Arc paths just inside the glowing circle (r=210, so use r=190 for text) -->
-    <path id="topCurve" d="M 366,331 A 190,190 0 0 1 746,331" />
-    <path id="bottomCurve" d="M 746,331 A 190,190 0 0 1 366,331" />
+    <!-- Arc paths farther inside the glowing circle (r=170 for text) -->
+    <path id="topCurve" d="M 386,331 A 170,170 0 0 1 726,331" />
+    <!-- Bottom arc now goes left-to-right for upright text -->
+    <path id="bottomCurve" d="M 386,331 A 170,170 0 0 0 726,331" />
   </defs>
 
   <!-- Outer glowing circle -->
@@ -31,14 +32,14 @@
           stroke="red" stroke-width="3" fill="none"
           filter="url(#glow)" class="pulsing-glow" />
 
-  <!-- Through Power (top arc, inside circle) -->
+  <!-- Through Power (top arc, farther inside circle) -->
   <text fill="red" font-size="50" filter="url(#glow)" class="pulsing-glow">
     <textPath href="#topCurve" startOffset="50%" text-anchor="middle" dominant-baseline="middle">
       Through Power
     </textPath>
   </text>
 
-  <!-- I Gain Victory (bottom arc, inside circle) -->
+  <!-- I Gain Victory (bottom arc, farther inside circle, now upright) -->
   <text fill="red" font-size="50" filter="url(#glow)" class="pulsing-glow">
     <textPath href="#bottomCurve" startOffset="50%" text-anchor="middle" dominant-baseline="middle">
       I Gain Victory
