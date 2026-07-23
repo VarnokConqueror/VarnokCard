@@ -1,0 +1,254 @@
+(() => {
+  'use strict';
+
+  const $ = id => document.getElementById(id);
+  const canvas = $('game');
+  const ctx = canvas.getContext('2d');
+  const choiceInput = $('choiceInput');
+  const raceBtn = $('raceBtn');
+  const winnerCard = $('winnerCard');
+  const countdownEl = $('countdown');
+  const announcerText = $('announcerText');
+  const raceStatus = $('raceStatus');
+  const colors = ['#25e7ff','#ff3bd4','#9b5cff','#50e879','#ffcc35','#ff6b75','#49a4ff','#f08cff'];
+  const statKeys = ['speed','power','agility','traction','endurance'];
+  const statShort = {speed:'SPD',power:'PWR',agility:'AGI',traction:'GRP',endurance:'END'};
+  const speciesProfiles = [
+    {name:'Rex Titan',type:0,color:'#ff6b75',stats:{speed:6,power:9,agility:3,traction:6,endurance:6}},
+    {name:'Neon Gojira',type:1,color:'#25e7ff',stats:{speed:5,power:8,agility:4,traction:5,endurance:8}},
+    {name:'Void Dragon',type:2,color:'#9b5cff',stats:{speed:7,power:5,agility:8,traction:4,endurance:6}},
+    {name:'Court Kong',type:3,color:'#c58cff',stats:{speed:6,power:8,agility:5,traction:7,endurance:4}},
+    {name:'Tricera Prime',type:4,color:'#ffcc35',stats:{speed:5,power:9,agility:3,traction:8,endurance:5}},
+    {name:'Mecha Raptor',type:5,color:'#49a4ff',stats:{speed:9,power:4,agility:9,traction:5,endurance:3}},
+    {name:'Hydra Pup',type:6,color:'#50e879',stats:{speed:7,power:5,agility:7,traction:6,endurance:5}},
+    {name:'Magma Croc',type:7,color:'#ff7a3d',stats:{speed:4,power:8,agility:2,traction:8,endurance:8}},
+    {name:'Bonejaw Rex',type:0,color:'#d67b44',stats:{speed:7,power:8,agility:4,traction:5,endurance:6}},
+    {name:'Storm Wyvern',type:2,color:'#8fe8ff',stats:{speed:8,power:4,agility:8,traction:3,endurance:7}},
+    {name:'Ironback Kong',type:3,color:'#8d5bff',stats:{speed:4,power:9,agility:4,traction:7,endurance:6}},
+    {name:'Razorwing Raptor',type:5,color:'#f08cff',stats:{speed:8,power:3,agility:9,traction:6,endurance:4}}
+  ];
+  const species = speciesProfiles.map(profile=>profile.name);
+  const samples = [
+    ['Pizza','Tacos','Chinese','Burgers'],
+    ['Go out','Stay home','Movie','Game'],
+    ['Buy it','Wait a week','Find used','Build it']
+  ];
+
+  let choices = [];
+  let scores = {};
+  let heatIndex = 0;
+  let heats = 3;
+  let state = 'idle';
+  let raceToken = 0;
+  let baseSeed = '';
+  let rng = Math.random;
+  let racers = [];
+  let hazards = [];
+  let particles = [];
+  let crowd = [];
+  let viewportW = 1000;
+  let viewportH = 560;
+  let dpr = 1;
+  let cameraX = 0;
+  let worldTime = 0;
+  let raceElapsed = 0;
+  let finishX = 2920;
+  const startX = 220;
+  const worldWidth = 3260;
+  let lastFrame = performance.now();
+  let crowdSource = null;
+  let crowdGain = null;
+  let audioCtx = null;
+  let matchSerial = 0;
+  let screenShake = 0;
+  let speechQueue = [];
+  let speechActive = false;
+  let speechGeneration = 0;
+  let activeSpeechTicket = 0;
+  let voiceLoadAttempts = 0;
+  let availableVoices = [];
+  let hazardBatch = [];
+  let hazardBatchTimer = 0;
+  let hazardSpeechCooldownUntil = 0;
+  let activeSpeechKind = null;
+  let lastCommentaryAt = -99;
+  let championRacer = null;
+  let championReason = '';
+  let winningTimes = {};
+  let heatResults = [];
+  let matchRoster = [];
+  let lastRosterSignature = '';
+  let recordedVoiceClips = new Map();
+  let currentRecordedAudio = null;
+  const voiceProfiles = {
+    natural:{rate:.90,pitch:.94,audioRate:.98},
+    live:{rate:1.14,pitch:.86,audioRate:1.00},
+    fast:{rate:1.38,pitch:1.02,audioRate:1.10}
+  };
+
+  function hashSeed(text){
+    let h = 2166136261 >>> 0;
+    for(let i=0;i<text.length;i++){
+      h ^= text.charCodeAt(i);
+      h = Math.imul(h,16777619);
+    }
+    return h >>> 0;
+  }
+  function makeRng(seedText){
+    let a = hashSeed(seedText) || 0x9e3779b9;
+    return () => {
+      a |= 0;
+      a = a + 0x6D2B79F5 | 0;
+      let t = Math.imul(a ^ a >>> 15, 1 | a);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+  function rand(min=0,max=1){ return min + (max-min)*rng(); }
+  function shuffledProfiles(seedText){
+    const localRng=makeRng(seedText);
+    const pool=speciesProfiles.slice();
+    for(let i=pool.length-1;i>0;i--){
+      const j=Math.floor(localRng()*(i+1));
+      [pool[i],pool[j]]=[pool[j],pool[i]];
+    }
+    return pool;
+  }
+  function draftMatchRoster(){
+    let attempt=0,selected=[],signature='';
+    do{
+      const pool=shuffledProfiles(`${baseSeed}|roster:${matchSerial}|attempt:${attempt}`);
+      selected=choices.map((_,i)=>pool[i%pool.length]);
+      signature=selected.map(profile=>profile.name).join('|');
+      attempt++;
+    }while(signature===lastRosterSignature && attempt<24);
+    matchRoster=selected;
+    lastRosterSignature=signature;
+    renderRosterReport();
+  }
+  function optionOn(id){ return $(id).value !== 'off'; }
+  function clamp(value,min,max){ return Math.max(min,Math.min(max,value)); }
+  function smoothstep01(value){ const x=clamp(value,0,1); return x*x*(3-2*x); }
+  function bestWinningTime(index){
+    const times=winningTimes[index] || [];
+    return times.length ? Math.min(...times) : Infinity;
+  }
+  function resolveFinalWinner(){
+    const standings=choices.map((_,index)=>({index,wins:scores[index]||0,time:bestWinningTime(index)}));
+    const maxWins=Math.max(...standings.map(s=>s.wins));
+    const tied=standings.filter(s=>s.wins===maxWins && s.wins>0)
+      .sort((a,b)=>a.time-b.time || a.index-b.index);
+    return {index:tied[0]?.index ?? 0,tieBreak:tied.length>1,maxWins,bestTime:tied[0]?.time ?? Infinity};
+  }
+
+  function resize(){
+    const rect = canvas.getBoundingClientRect();
+    viewportW = Math.max(320, Math.round(rect.width));
+    viewportH = Math.max(430, Math.round(rect.height));
+    dpr = Math.min(2, window.devicePixelRatio || 1);
+    canvas.width = Math.round(viewportW*dpr);
+    canvas.height = Math.round(viewportH*dpr);
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    buildCrowd();
+  }
+
+  function buildCrowd(){
+    const rows = 4;
+    const perRow = Math.ceil(viewportW / 18) + 20;
+    const skin = ['#f2c39f','#c98762','#8d573d','#f0b88f','#6e402f'];
+    crowd = [];
+    for(let row=0;row<rows;row++){
+      for(let i=0;i<perRow;i++){
+        crowd.push({
+          x:i*18-36+(row%2)*9,row,phase:(i*1.73+row*.81)%6.28,
+          shirt:colors[(i+row*3)%colors.length],skin:skin[(i*3+row)%skin.length],
+          hair:(i+row)%4,pose:(i*5+row)%7,sign:(i+row*11)%29===0,
+          glow:(i*7+row)%13===0
+        });
+      }
+    }
+  }
+
+  function ensureAudio(){
+    if(!optionOn('soundToggle')) return;
+    if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if(audioCtx.state === 'suspended') audioCtx.resume();
+    if(!crowdSource){
+      const seconds = 2;
+      const buffer = audioCtx.createBuffer(1,audioCtx.sampleRate*seconds,audioCtx.sampleRate);
+      const data = buffer.getChannelData(0);
+      let smooth = 0;
+      for(let i=0;i<data.length;i++){
+        smooth = smooth*.96 + (Math.random()*2-1)*.04;
+        data[i] = smooth;
+      }
+      crowdSource = audioCtx.createBufferSource();
+      crowdGain = audioCtx.createGain();
+      const filter = audioCtx.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.value = 900;
+      filter.Q.value = .55;
+      crowdSource.buffer = buffer;
+      crowdSource.loop = true;
+      crowdGain.gain.value = .0001;
+      crowdSource.connect(filter).connect(crowdGain).connect(audioCtx.destination);
+      crowdSource.start();
+    }
+  }
+
+  function tone(freq,duration=.12,type='square',gain=.12,slideTo=null){
+    if(!optionOn('soundToggle')) return;
+    ensureAudio();
+    const osc=audioCtx.createOscillator(), g=audioCtx.createGain();
+    osc.type=type; osc.frequency.value=freq;
+    if(slideTo) osc.frequency.exponentialRampToValueAtTime(slideTo,audioCtx.currentTime+duration);
+    g.gain.setValueAtTime(gain,audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(.0001,audioCtx.currentTime+duration);
+    osc.connect(g).connect(audioCtx.destination);
+    osc.start(); osc.stop(audioCtx.currentTime+duration);
+  }
+  function setCrowd(level,seconds=.25){
+    if(!optionOn('soundToggle')) return;
+    ensureAudio();
+    crowdGain.gain.cancelScheduledValues(audioCtx.currentTime);
+    crowdGain.gain.linearRampToValueAtTime(level,audioCtx.currentTime+seconds);
+  }
+  function cheer(){
+    setCrowd(.22,.08);
+    tone(220,.22,'sawtooth',.08,660);
+    setTimeout(()=>setCrowd(.035,1.3),1000);
+  }
+  function slipSound(){
+    tone(980,.28,'sawtooth',.1,120);
+  }
+  function voiceScore(v){
+    let score=0;
+    if(/^en(-|_)/i.test(v.lang)) score+=30;
+    if(/Natural|Neural|Online/i.test(v.name)) score+=90;
+    if(/Aria|Jenny|Guy|Ryan|Sonia|Libby|Natasha|William|Andrew|Ava/i.test(v.name)) score+=55;
+    if(/Microsoft|Google/i.test(v.name)) score+=12;
+    if(/Zira|David|Mark/i.test(v.name)) score-=12;
+    return score;
+  }
+
+  function voiceKey(v){ return v.voiceURI || `${v.name}|${v.lang}`; }
+
+  function setVoiceStatus(text){
+    const el=$('voiceStatus');
+    if(el) el.textContent=text;
+  }
+
+  function loadVoices(){
+    const select=$('voiceSelect');
+    if(!('speechSynthesis' in window)){
+      availableVoices=[];
+      select.innerHTML='<option value="__none__">Speech not supported</option>';
+      select.disabled=true;
+      $('previewVoiceBtn').disabled=true;
+      setVoiceStatus('Opera did not expose browser speech on this device. The race still works without narration.');
+      return;
+    }
+    availableVoices=window.speechSynthesis.getVoices().slice().sort((a,b)=>voiceScore(b)-voiceScore(a));
+    const saved=localStorage.getItem('courtDashVoice');
+    select.innerHTML='';
+    i

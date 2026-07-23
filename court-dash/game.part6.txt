@@ -1,0 +1,143 @@
+.type===5?'#fff':'#ff315f';ctx.beginPath();ctx.arc(Math.cos(angle)*2.7,Math.sin(angle)*2.1,2.2,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle='#08030f';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(-7,-7);ctx.lineTo(7,-5+Math.sin(angle)*2);ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawVictoryChomp(r){
+    if(r.victoryStart<0) return;
+    const pose=riderPose(r);
+    const age=pose.age;
+    if(age<1.38 || age>2.28) return;
+    const mouth=mouthPoint(r.type);
+    const targetAngle=Math.atan2(pose.y-mouth.y,pose.x-mouth.x);
+    const openIn=smoothstep01((age-1.38)/.26);
+    const closeOut=smoothstep01((age-1.91)/.25);
+    const snap=clamp(openIn-closeOut,0,1);
+    ctx.save();ctx.translate(mouth.x,mouth.y);ctx.rotate(clamp(targetAngle*.34,-.44,.22));
+    ctx.fillStyle='rgba(3,1,8,.96)';ctx.strokeStyle='#ff557f';ctx.lineWidth=3.5;ctx.beginPath();ctx.ellipse(0,0,20+snap*12,10+snap*9,0,0,Math.PI*2);ctx.fill();ctx.stroke();
+    ctx.fillStyle='#fff';for(let i=-4;i<=3;i++){ctx.beginPath();ctx.moveTo(i*5,-8-snap*5);ctx.lineTo(i*5+3,-1);ctx.lineTo(i*5+6,-8-snap*5);ctx.fill();ctx.beginPath();ctx.moveTo(i*5,8+snap*5);ctx.lineTo(i*5+3,1);ctx.lineTo(i*5+6,8+snap*5);ctx.fill()}
+    if(age>1.88){ctx.fillStyle='#ffcc35';ctx.font='900 15px Oxanium,Inter,sans-serif';ctx.textAlign='center';ctx.fillText('CHOMP!',5,-29)}
+    ctx.restore();
+  }
+
+  function drawRacer(r){
+    const runRate=state==='racing'?(r.slow>0?6:11):3;
+    const t=worldTime*runRate+r.phase;
+    const stride=Math.sin(t);
+    const leg=stride*11;
+    const bob=Math.abs(Math.sin(t))*3.4;
+    const slip=r.slow>0;
+    const jump=r.jumpY||0;
+    const scale=Math.max(.62,Math.min(1.08,(viewportH-225)/(choices.length*68)));
+
+    const shadowScale=Math.max(.35,1-jump/145);
+    ctx.save();ctx.translate(r.x,r.y+42*scale);ctx.globalAlpha=.34*(1-jump/260);ctx.fillStyle='#020106';ctx.beginPath();ctx.ellipse(0,0,55*scale*shadowScale,10*scale*shadowScale,0,0,Math.PI*2);ctx.fill();ctx.restore();
+
+    ctx.save();
+    ctx.translate(r.x,r.y-bob-jump);
+    ctx.scale(scale,scale);
+    const victoryAge=r.victoryStart>=0?worldTime-r.victoryStart:-1;
+    const rearIn=victoryAge>=0?smoothstep01((victoryAge-.04)/.58):0;
+    const rearOut=victoryAge>=0?smoothstep01((victoryAge-2.30)/.52):0;
+    const rear=rearIn*(1-rearOut);
+    if(rear>0){
+      ctx.translate(-20,40);ctx.rotate(-.43*rear);ctx.translate(20,-40);ctx.translate(-5*rear,-12*rear);
+    }else if(slip) ctx.rotate(Math.sin(t*1.5)*.24-.08);
+    else if(jump>0){
+      const jumpPose=clamp(jump/92,0,1);
+      ctx.translate(-18,38);ctx.rotate(-.18*jumpPose+Math.sin(t*.35)*.018);ctx.translate(18,-38);
+    }else ctx.rotate(Math.sin(t*.5)*.025);
+
+    for(let i=0;i<r.trail.length;i++){
+      const tr=r.trail[i],alpha=(i/r.trail.length)*.08;
+      ctx.globalAlpha=alpha;ctx.fillStyle=r.color;ctx.beginPath();ctx.ellipse(tr.x-r.x-32,5+jump,30,14,0,0,Math.PI*2);ctx.fill();
+    }
+    ctx.globalAlpha=1;
+
+    ctx.shadowColor=r.color;ctx.shadowBlur=10;
+    const dark=shade(r.color,-58), mid=shade(r.color,-18), light=shade(r.color,46);
+    if(r.type===3) drawKong(r.color,dark,light,leg,stride);
+    else if(r.type===4) drawTricera(r.color,dark,light,leg,stride);
+    else if(r.type===5) drawMecha(r.color,dark,light,leg,stride);
+    else if(r.type===2 || r.type===6) drawDragon(r.color,dark,light,leg,r.type===6,stride);
+    else drawDino(r.color,dark,mid,light,leg,r.type===1 || r.type===7,stride);
+    ctx.shadowBlur=0;
+
+    if(championRacer===r && state==='victory') drawVictoryFocus(r);
+    drawRider(r,t,stride);
+    if(championRacer===r && state==='victory') drawVictoryChomp(r);
+
+    ctx.fillStyle='rgba(4,2,9,.88)';roundedRect(-67,-77,134,24,9);
+    ctx.strokeStyle='rgba(255,255,255,.16)';ctx.lineWidth=1;ctx.strokeRect(-63,-73,126,16);
+    ctx.fillStyle='#fff';ctx.font='900 13px Oxanium,Inter,sans-serif';ctx.textAlign='center';ctx.fillText(r.name,0,-60);
+    ctx.restore();
+  }
+
+  function bodyEllipse(x,y,rx,ry,rot,fill,stroke){
+    ctx.fillStyle=fill;ctx.strokeStyle=stroke;ctx.lineWidth=4;ctx.beginPath();ctx.ellipse(x,y,rx,ry,rot,0,Math.PI*2);ctx.fill();ctx.stroke();
+  }
+
+  function clawFoot(x,y,flip=1){
+    ctx.fillStyle='#e9e0cf';
+    for(let i=0;i<3;i++){ctx.beginPath();ctx.moveTo(x+i*5*flip,y);ctx.lineTo(x+(i*5+5)*flip,y+2);ctx.lineTo(x+(i*5+2)*flip,y-3);ctx.fill()}
+  }
+
+  function drawDino(c,d,m,l,leg,spiky,stride){
+    ctx.strokeStyle=d;ctx.lineWidth=19;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(-25,7);ctx.quadraticCurveTo(-59,-2,-82,18+stride*2);ctx.stroke();
+    bodyEllipse(-8,0,42,29,-.04,c,d);bodyEllipse(28,-24,31,23,-.12,c,d);
+    ctx.fillStyle=m;ctx.beginPath();ctx.ellipse(-3,10,27,14,0,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle=l;ctx.beginPath();ctx.ellipse(39,-17,18,9,-.08,0,Math.PI*2);ctx.fill();
+    if(spiky){ctx.fillStyle=l;ctx.strokeStyle=d;ctx.lineWidth=2;for(let i=0;i<7;i++){ctx.beginPath();ctx.moveTo(-39+i*12,-18-Math.sin(i)*4);ctx.lineTo(-32+i*12,-43-(i%2)*5);ctx.lineTo(-23+i*12,-19);ctx.closePath();ctx.fill();ctx.stroke()}}
+    ctx.strokeStyle=d;ctx.lineWidth=11;ctx.beginPath();ctx.moveTo(-19,19);ctx.lineTo(-21+leg,43);ctx.moveTo(13,20);ctx.lineTo(17-leg,43);ctx.stroke();
+    clawFoot(-30+leg,45);clawFoot(8-leg,45);
+    ctx.lineWidth=7;ctx.beginPath();ctx.moveTo(14,-2);ctx.lineTo(36,9+leg*.24);ctx.lineTo(42,6);ctx.stroke();
+    ctx.fillStyle=d;ctx.beginPath();ctx.moveTo(21,-7);ctx.quadraticCurveTo(45,-5,57,-1);ctx.quadraticCurveTo(47,14,26,10);ctx.closePath();ctx.fill();
+    eyeAndTeeth(37,-30,true);ctx.fillStyle=l;ctx.beginPath();ctx.arc(12,-15,3,0,Math.PI*2);ctx.arc(-1,-20,2.5,0,Math.PI*2);ctx.fill();
+  }
+
+  function drawDragon(c,d,l,leg,hydra,stride){
+    ctx.strokeStyle=d;ctx.lineWidth=16;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(-25,8);ctx.quadraticCurveTo(-62,-7,-82,11+stride*2);ctx.stroke();
+    bodyEllipse(-5,1,41,28,0,c,d);
+    ctx.fillStyle=l;ctx.strokeStyle=d;ctx.lineWidth=3;
+    ctx.beginPath();ctx.moveTo(-16,-9);ctx.quadraticCurveTo(-53,-51,-58,-17);ctx.lineTo(-7,-28);ctx.closePath();ctx.fill();ctx.stroke();
+    ctx.beginPath();ctx.moveTo(3,-11);ctx.quadraticCurveTo(32,-52,39,-19);ctx.lineTo(28,-19);ctx.closePath();ctx.fill();ctx.stroke();
+    const heads=hydra?3:1;
+    for(let i=0;i<heads;i++){
+      const oy=hydra?(i-1)*14:0,ox=hydra?22+Math.abs(i-1)*7:28;
+      ctx.strokeStyle=d;ctx.lineWidth=9;ctx.beginPath();ctx.moveTo(8,-7);ctx.quadraticCurveTo(14,-18+oy,ox-8,-20+oy);ctx.stroke();
+      bodyEllipse(ox,-23+oy,24,16,-.05,c,d);eyeAndTeeth(ox+8,-27+oy,true);
+      ctx.fillStyle=l;ctx.beginPath();ctx.moveTo(ox-6,-38+oy);ctx.lineTo(ox,-51+oy);ctx.lineTo(ox+4,-37+oy);ctx.fill();
+    }
+    ctx.strokeStyle=d;ctx.lineWidth=10;ctx.beginPath();ctx.moveTo(-17,20);ctx.lineTo(-20+leg,43);ctx.moveTo(14,20);ctx.lineTo(18-leg,43);ctx.stroke();clawFoot(-28+leg,45);clawFoot(9-leg,45);
+  }
+
+  function drawKong(c,d,l,leg,stride){
+    ctx.strokeStyle=d;ctx.lineWidth=18;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(-20,-2);ctx.lineTo(-47,22+leg*.22);ctx.moveTo(20,-2);ctx.lineTo(48,22-leg*.22);ctx.stroke();
+    bodyEllipse(0,3,36,34,0,c,d);bodyEllipse(1,-29,27,23,0,d,'#050208');
+    ctx.fillStyle=l;ctx.strokeStyle=d;ctx.lineWidth=3;ctx.beginPath();ctx.ellipse(4,-23,18,13,0,0,Math.PI*2);ctx.fill();ctx.stroke();
+    ctx.fillStyle=shade(c,28);ctx.beginPath();ctx.moveTo(-23,-2);ctx.quadraticCurveTo(0,17,23,-2);ctx.lineTo(19,20);ctx.quadraticCurveTo(0,31,-19,20);ctx.closePath();ctx.fill();
+    ctx.strokeStyle=d;ctx.lineWidth=14;ctx.beginPath();ctx.moveTo(-15,26);ctx.lineTo(-17+leg,47);ctx.moveTo(15,26);ctx.lineTo(17-leg,47);ctx.stroke();clawFoot(-27+leg,49);clawFoot(8-leg,49);
+    ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(-8,-34,4,0,Math.PI*2);ctx.arc(10,-34,4,0,Math.PI*2);ctx.fill();ctx.fillStyle='#08030f';ctx.beginPath();ctx.arc(-7,-34,2,0,Math.PI*2);ctx.arc(11,-34,2,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle='#08030f';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(-9,-17);ctx.quadraticCurveTo(3,-12,14,-18);ctx.stroke();
+  }
+
+  function drawTricera(c,d,l,leg,stride){
+    ctx.strokeStyle=d;ctx.lineWidth=17;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(-31,9);ctx.lineTo(-72,16+stride*2);ctx.stroke();
+    bodyEllipse(-8,3,44,28,0,c,d);bodyEllipse(29,-14,29,21,0,c,d);
+    ctx.fillStyle=d;ctx.beginPath();ctx.arc(21,-17,29,Math.PI*.7,Math.PI*1.64);ctx.lineTo(13,-1);ctx.fill();
+    ctx.fillStyle=l;ctx.strokeStyle=d;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(41,-31);ctx.lineTo(68,-42);ctx.lineTo(45,-18);ctx.closePath();ctx.fill();ctx.stroke();ctx.beginPath();ctx.moveTo(26,-36);ctx.lineTo(34,-57);ctx.lineTo(37,-29);ctx.closePath();ctx.fill();ctx.stroke();
+    ctx.strokeStyle=d;ctx.lineWidth=11;ctx.beginPath();ctx.moveTo(-22,21);ctx.lineTo(-24+leg,45);ctx.moveTo(16,21);ctx.lineTo(19-leg,45);ctx.stroke();clawFoot(-33+leg,47);clawFoot(10-leg,47);
+    eyeAndTeeth(36,-17,false);ctx.fillStyle=l;for(let i=0;i<4;i++){ctx.beginPath();ctx.arc(-25+i*13,-3+(i%2)*5,3,0,Math.PI*2);ctx.fill()}
+  }
+
+  function drawMecha(c,d,l,leg,stride){
+    ctx.save();
+    ctx.lineJoin='round';ctx.lineCap='round';
+
+    // Long articulated tail establishes the raptor silhouette.
+    ctx.strokeStyle='#05030a';ctx.lineWidth=20;ctx.beginPath();ctx.moveTo(-31,7);ctx.quadraticCurveTo(-65,-3,-94,17+stride*2);ctx.stroke();
+    ctx.strokeStyle=c;ctx.lineWidth=11;ctx.beginPath();ctx.moveTo(-31,7);ctx.quadraticCurveTo(-65,-3,-94,17+stride*2);ctx.stroke();
+    ctx.strokeStyle=l;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(-38,2);ctx.quadraticCurveTo(-68,-7,-88,13+stride*2);ctx.stroke();
+
+    // Angular armored torso and glowing reactor.
+    const armor=ctx.createLinearGradient(-40,-28,36,24);armor.addColorStop(0,l);armor.addColorStop(.42,c);ar

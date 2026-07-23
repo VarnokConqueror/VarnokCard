@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#090315">
+<meta name="application-name" content="Court Dash: Kaiju 100m">
+<meta name="court-dash-build" content="10">
+<link rel="icon" type="image/png" href="crown.svg">
+<link rel="apple-touch-icon" href="crown.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Oxanium:wght@400;600;700;800&display=swap" rel="stylesheet">
+<title>Court Dash: Kaiju 100m</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<main class="app">
+  <header class="topbar">
+    <div class="brand">
+      <div class="crest" aria-hidden="true"><img id="brandCrown" src="crown.svg" alt=""></div>
+      <div>
+        <h1>Court Dash: Kaiju 100m</h1>
+        <div class="subtitle">The Conqueror’s Court Racing Arena</div>
+      </div>
+    </div>
+    <div class="motto">THROUGH POWER, I GAIN VICTORY.<br>THROUGH CHAOS, A DECISION.</div>
+  </header>
+
+  <section class="panel controls">
+    <div class="command-row">
+      <div class="menu-strip">
+        <details class="menu-dropdown" id="racersMenu">
+          <summary>Racers <span id="racerCount" class="menu-count">0</span></summary>
+          <div class="menu-popover wide">
+            <div class="menu-title">Choose the contenders</div>
+            <div class="choice-line">
+              <input id="choiceInput" class="choice-input" maxlength="34" placeholder="Add decisions… commas add several">
+              <button id="addBtn" class="btn cyan compact">Add</button>
+            </div>
+            <div class="mini-actions">
+              <button id="sampleBtn" class="btn compact">Load sample</button>
+              <button id="resetBtn" class="btn compact">Reset race</button>
+            </div>
+            <div id="chips" class="chips"></div>
+            <div id="rosterReport" class="roster-report"><div class="roster-empty">Add at least two decisions. Kaiju are drafted when the match starts.</div></div>
+          </div>
+        </details>
+        <details class="menu-dropdown" id="raceMenu">
+          <summary>Race setup</summary>
+          <div class="menu-popover">
+            <div class="menu-title">Rules of the dash</div>
+            <div class="menu-grid">
+              <label class="field"><span>Match</span><select id="heatsSelect"><option value="1">One heat</option><option value="3" selected>Best of 3</option><option value="5">Best of 5</option></select></label>
+              <label class="field"><span>Hazards</span><select id="hazardsToggle"><option value="on" selected>Enabled</option><option value="off">Disabled</option></select></label>
+              <label class="field"><span>Victory feast</span><select id="feastToggle"><option value="on" selected>Rider gets eaten</option><option value="off">Rider survives</option></select></label>
+              <label class="field"><span>Seed</span><input id="seedInput" class="menu-input" maxlength="40" placeholder="Random unless entered"></label>
+            </div>
+          </div>
+        </details>
+        <details class="menu-dropdown" id="audioMenu">
+          <summary>Audio</summary>
+          <div class="menu-popover wide">
+            <div class="menu-title">Crowd and announcer</div>
+            <div class="menu-grid">
+              <label class="field"><span>Crowd + SFX</span><select id="soundToggle"><option value="on" selected>On</option><option value="off">Off</option></select></label>
+              <label class="field"><span>Announcer</span><select id="voiceToggle"><option value="on" selected>On</option><option value="off">Off</option></select></label>
+              <label class="field"><span>Voice source</span><select id="voiceSource"><option value="system" selected>Windows / Opera voice</option><option value="recorded">My recordings</option></select></label>
+              <label class="field"><span>System voice</span><select id="voiceSelect"><option value="__loading__">Loading voices…</option></select></label>
+              <label class="field"><span>Delivery</span><select id="voicePace"><option value="natural">Natural</option><option value="live" selected>Live play-by-play</option><option value="fast">Fast</option></select></label>
+            </div>
+            <div class="mini-actions">
+              <button id="previewVoiceBtn" class="btn cyan compact">Preview voice</button>
+              <button id="loadVoicePackBtn" class="btn compact">Load my recordings</button>
+              <input id="voicePackInput" type="file" accept="audio/*" multiple hidden>
+            </div>
+            <div id="voiceStatus" class="voice-status">Loading the voices available through Opera and Windows…</div>
+          </div>
+        </details>
+        <details class="menu-dropdown align-right" id="displayMenu">
+          <summary>Display</summary>
+          <div class="menu-popover">
+            <div class="menu-title">Arena view</div>
+            <label class="field"><span>Screen mode</span><select id="fullscreenSelect"><option value="windowed" selected>Windowed</option><option value="fullscreen">Fullscreen</option></select></label>
+          </div>
+        </details>
+      </div>
+      <button id="raceBtn" class="btn primary start-btn" disabled>Start the 100m</button>
+    </div>
+  </section>
+
+  <section class="panel game-shell">
+    <canvas id="game" aria-label="Side-scrolling kaiju race"></canvas>
+    <div class="hud">
+      <div class="hud-box announcer"><small>Court Announcer</small><span id="announcerText">Add decisions to summon the beasts.</span></div>
+      <div class="hud-box race-status" id="raceStatus">Add 2–8 decisions<br>to summon the racers</div>
+    </div>
+    <div id="countdown" class="countdown">3</div>
+    <div id="winnerCard" class="winner-card">
+      <div class="kicker">The Court has spoken</div>
+      <h2 id="winnerName">Champion</h2>
+      <p id="winnerSpecies"></p>
+      <button id="raceAgainBtn" class="btn primary">Race again</button>
+    </div>
+  </section>
+
+  <section class="panel scorebar">
+    <div id="heatLabel">Heat 1 of 3</div>
+    <div id="scores" class="scores"></div>
+  </section>
+  <div class="footnote">Online Build v10 · Balanced kaiju stats, fresh randomized rosters per match, stat-driven hazards and hurdles, blank startup, and the cyan Court crown.</div>
+</main>
+
+<script src="game-loader.js"></script>
+</body>
+</html>

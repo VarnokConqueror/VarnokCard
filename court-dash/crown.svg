@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-label="Conqueror’s Court crown">
+<defs><filter id="g" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="18" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+<rect width="1024" height="1024" fill="#07030f"/>
+<g fill="none" stroke="#27e7ff" stroke-width="86" stroke-linecap="round" stroke-linejoin="round" filter="url(#g)">
+<path d="M166 287 L302 720 H722 L858 287 L650 463 L512 171 L374 463 Z"/>
+<path d="M287 845 H737"/>
+</g></svg>

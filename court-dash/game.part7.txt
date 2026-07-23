@@ -1,0 +1,172 @@
+mor.addColorStop(1,d);
+    ctx.fillStyle=armor;ctx.strokeStyle='#040208';ctx.lineWidth=5;
+    ctx.beginPath();ctx.moveTo(-42,-18);ctx.lineTo(-12,-32);ctx.lineTo(26,-23);ctx.lineTo(39,3);ctx.lineTo(18,25);ctx.lineTo(-25,24);ctx.lineTo(-47,7);ctx.closePath();ctx.fill();ctx.stroke();
+    ctx.fillStyle='rgba(4,2,10,.74)';ctx.beginPath();ctx.ellipse(-5,3,21,15,0,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#27e7ff';ctx.shadowColor='#27e7ff';ctx.shadowBlur=16;ctx.beginPath();ctx.arc(-4,2,7,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;
+    ctx.strokeStyle='rgba(255,255,255,.5)';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(-31,-13);ctx.lineTo(-13,-25);ctx.lineTo(8,-20);ctx.moveTo(18,-15);ctx.lineTo(31,2);ctx.stroke();
+
+    // Dorsal blades.
+    ctx.fillStyle=l;ctx.strokeStyle='#040208';ctx.lineWidth=3;
+    for(let i=0;i<4;i++){
+      const x=-29+i*15;
+      ctx.beginPath();ctx.moveTo(x,-20);ctx.lineTo(x+7,-42-(i%2)*6);ctx.lineTo(x+13,-20);ctx.closePath();ctx.fill();ctx.stroke();
+    }
+
+    // Narrow neck and predatory head with a visible jaw.
+    ctx.strokeStyle='#040208';ctx.lineWidth=15;ctx.beginPath();ctx.moveTo(22,-14);ctx.lineTo(42,-30);ctx.stroke();
+    ctx.strokeStyle=c;ctx.lineWidth=9;ctx.beginPath();ctx.moveTo(22,-14);ctx.lineTo(42,-30);ctx.stroke();
+    ctx.fillStyle=armor;ctx.strokeStyle='#040208';ctx.lineWidth=4;
+    ctx.beginPath();ctx.moveTo(34,-42);ctx.lineTo(62,-39);ctx.lineTo(79,-26);ctx.lineTo(61,-15);ctx.lineTo(36,-20);ctx.lineTo(29,-31);ctx.closePath();ctx.fill();ctx.stroke();
+    ctx.fillStyle=d;ctx.beginPath();ctx.moveTo(45,-20);ctx.lineTo(76,-24);ctx.lineTo(60,-10);ctx.lineTo(40,-14);ctx.closePath();ctx.fill();ctx.stroke();
+    ctx.fillStyle='#ff315f';ctx.shadowColor='#ff315f';ctx.shadowBlur=13;ctx.beginPath();ctx.arc(58,-31,4.5,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;
+    ctx.fillStyle='#f7f0ff';for(let i=0;i<4;i++){ctx.beginPath();ctx.moveTo(49+i*6,-19);ctx.lineTo(52+i*6,-12);ctx.lineTo(55+i*6,-20);ctx.fill()}
+
+    // Small grasping arms.
+    ctx.strokeStyle='#05030a';ctx.lineWidth=8;ctx.beginPath();ctx.moveTo(24,-3);ctx.lineTo(43,8+stride*2);ctx.lineTo(52,3);ctx.stroke();
+    ctx.strokeStyle=l;ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(24,-3);ctx.lineTo(43,8+stride*2);ctx.lineTo(52,3);ctx.stroke();
+    ctx.fillStyle='#f4eaff';ctx.beginPath();ctx.moveTo(51,3);ctx.lineTo(60,0);ctx.lineTo(55,7);ctx.fill();ctx.beginPath();ctx.moveTo(51,4);ctx.lineTo(60,8);ctx.lineTo(54,10);ctx.fill();
+
+    // Digitigrade legs: hip, reversed knee, ankle, clawed foot.
+    function mechLeg(hipX,phase,back=false){
+      const swing=phase;
+      const kneeX=hipX+(back?-11:11)+swing*.42;
+      const ankleX=hipX+swing;
+      ctx.strokeStyle='#040208';ctx.lineWidth=14;ctx.beginPath();ctx.moveTo(hipX,16);ctx.lineTo(kneeX,32);ctx.lineTo(ankleX,49);ctx.stroke();
+      ctx.strokeStyle=back?d:l;ctx.lineWidth=8;ctx.beginPath();ctx.moveTo(hipX,16);ctx.lineTo(kneeX,32);ctx.lineTo(ankleX,49);ctx.stroke();
+      ctx.fillStyle=c;ctx.beginPath();ctx.arc(kneeX,32,5,0,Math.PI*2);ctx.fill();
+      ctx.strokeStyle='#040208';ctx.lineWidth=6;ctx.beginPath();ctx.moveTo(ankleX,49);ctx.lineTo(ankleX+18,50);ctx.stroke();
+      ctx.strokeStyle='#f4eaff';ctx.lineWidth=2.5;for(let i=0;i<3;i++){ctx.beginPath();ctx.moveTo(ankleX+9+i*5,49);ctx.lineTo(ankleX+15+i*5,45);ctx.stroke()}
+    }
+    mechLeg(-20,leg,true);mechLeg(15,-leg,false);
+    ctx.restore();
+  }
+
+  function eyeAndTeeth(x,y,teeth=true){
+    ctx.fillStyle='#fff';ctx.strokeStyle='#08030f';ctx.lineWidth=2;ctx.beginPath();ctx.arc(x,y,5.5,0,Math.PI*2);ctx.fill();ctx.stroke();
+    ctx.fillStyle='#ff315f';ctx.beginPath();ctx.arc(x+2,y,2.2,0,Math.PI*2);ctx.fill();
+    if(teeth){ctx.fillStyle='#08030f';roundedRect(x-7,y+8,20,8,3);ctx.fillStyle='#fff';for(let i=0;i<4;i++){ctx.beginPath();ctx.moveTo(x-3+i*5,y+8);ctx.lineTo(x+i*5,y+15);ctx.lineTo(x+3+i*5,y+8);ctx.fill()}}
+  }
+
+  function shade(hex,amt){
+    const n=parseInt(hex.slice(1),16);
+    const r=Math.max(0,Math.min(255,(n>>16)+amt));
+    const g=Math.max(0,Math.min(255,((n>>8)&255)+amt));
+    const b=Math.max(0,Math.min(255,(n&255)+amt));
+    return `rgb(${r},${g},${b})`;
+  }
+
+  function draw(){
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.clearRect(0,0,viewportW,viewportH);
+    const shakeX=screenShake>0?(Math.random()*2-1)*screenShake:0;
+    const shakeY=screenShake>0?(Math.random()*2-1)*screenShake*.45:0;
+    ctx.save();ctx.translate(shakeX,shakeY);
+    drawStadium();drawTrack();
+    if(state==='idle'){ctx.fillStyle='rgba(5,2,12,.46)';ctx.fillRect(0,182,viewportW,viewportH-222)}
+    ctx.restore();
+    screenShake*=.82;if(screenShake<.1)screenShake=0;
+  }
+
+  function updateScores(){
+    $('heatLabel').textContent=choices.length?`Heat ${Math.min(heatIndex+1,heats)} of ${heats}`:'No racers entered';
+    $('scores').innerHTML='';
+    choices.forEach((c,i)=>{
+      const wins=scores[i]||0;
+      const best=bestWinningTime(i);
+      const profile=matchRoster[i];
+      const s=document.createElement('div');s.className='score';
+      const title=document.createElement('b');title.textContent=`${c}: ${wins} ${wins===1?'win':'wins'}`;s.appendChild(title);
+      if(profile){
+        const speciesEl=document.createElement('span');speciesEl.textContent=profile.name;s.appendChild(speciesEl);
+        const statLine=document.createElement('small');statLine.textContent=statKeys.map(key=>`${statShort[key]} ${profile.stats[key]}`).join(' · ')+(Number.isFinite(best)?` · ${best.toFixed(2)}s best`:'');s.appendChild(statLine);
+      }
+      $('scores').appendChild(s);
+    });
+  }
+
+  function frame(now){
+    const dt=Math.min(.033,(now-lastFrame)/1000 || .016);
+    lastFrame=now;
+    update(dt);draw();
+    requestAnimationFrame(frame);
+  }
+
+  $('addBtn').onclick=addChoices;
+  choiceInput.addEventListener('keydown',e=>{if(e.key==='Enter') addChoices()});
+  raceBtn.onclick=startMatch;
+  $('raceAgainBtn').onclick=startMatch;
+  $('resetBtn').onclick=resetGame;
+  $('sampleBtn').onclick=()=>{
+    choices=samples[Math.floor(Math.random()*samples.length)].slice();
+    renderChips();resetGame();
+  };
+  $('heatsSelect').onchange=()=>{heats=Number($('heatsSelect').value);resetGame()};
+  $('hazardsToggle').onchange=resetGame;
+  $('feastToggle').onchange=()=>{ if(state==='finished'||state==='victory') resetGame(); };
+  $('soundToggle').onchange=()=>{if(!optionOn('soundToggle'))setCrowd(.0001,.1)};
+  $('voiceToggle').onchange=()=>{if(!optionOn('voiceToggle'))stopSpeech();else loadVoices()};
+  $('voiceSelect').onchange=()=>localStorage.setItem('courtDashVoice',$('voiceSelect').value);
+  $('voicePace').value=localStorage.getItem('courtDashVoicePace') || 'live';
+  $('voicePace').onchange=()=>localStorage.setItem('courtDashVoicePace',$('voicePace').value);
+  $('previewVoiceBtn').onclick=()=>{
+    $('voiceToggle').value='on';
+    announce('Voice preview: Welcome to the Conqueror’s Court.','Welcome to the Conqueror’s Court. The kaiju are ready.',{priority:20,flush:true,clipKey:'preview'});
+  };
+
+  function normalizeClipKey(filename){
+    const base=filename.replace(/\.[^.]+$/,'').toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'');
+    const aliases={banana:'hazard_banana',slime:'hazard_slime',crate:'hazard_crate',hurdle:'hazard_hurdle',chaos:'hazard_chaos',race_start:'start',winner:'finish',victory:'champion'};
+    return aliases[base] || base;
+  }
+  $('loadVoicePackBtn').onclick=()=>$('voicePackInput').click();
+  $('voicePackInput').onchange=e=>{
+    for(const clip of recordedVoiceClips.values()) URL.revokeObjectURL(clip.url);
+    recordedVoiceClips.clear();
+    for(const file of e.target.files || []){
+      const key=normalizeClipKey(file.name);
+      recordedVoiceClips.set(key,{name:file.name,url:URL.createObjectURL(file)});
+    }
+    if(recordedVoiceClips.size){
+      $('voiceSource').value='recorded';
+      $('voiceSelect').disabled=true;
+      setVoiceStatus(`${recordedVoiceClips.size} recordings loaded. Expected names include ready, start, hazard_banana, hazard_slime, hazard_crate, hazard_hurdle, hazard_chaos, lead, finish, champion, idle, and preview.`);
+    }else setVoiceStatus('No audio recordings were selected.');
+  };
+  $('voiceSource').onchange=()=>{
+    const recorded=$('voiceSource').value==='recorded';
+    $('voiceSelect').disabled=recorded;
+    if(recorded && !recordedVoiceClips.size) setVoiceStatus('Load your WAV, MP3, M4A, or OGG announcer clips. Missing clips fall back to the system voice.');
+    else if(!recorded) loadVoices();
+  };
+
+  function syncFullscreenControl(){
+    $('fullscreenSelect').value=document.fullscreenElement?'fullscreen':'windowed';
+  }
+  $('fullscreenSelect').onchange=async()=>{
+    try{
+      if($('fullscreenSelect').value==='fullscreen') await document.documentElement.requestFullscreen?.();
+      else if(document.fullscreenElement) await document.exitFullscreen?.();
+    }catch(_){ syncFullscreenControl(); }
+  };
+  document.addEventListener('fullscreenchange',syncFullscreenControl);
+
+  const dropdowns=[...document.querySelectorAll('.menu-dropdown')];
+  dropdowns.forEach(menu=>menu.addEventListener('toggle',()=>{
+    if(menu.open) dropdowns.forEach(other=>{if(other!==menu) other.open=false});
+  }));
+  document.addEventListener('pointerdown',e=>{
+    if(!dropdowns.some(menu=>menu.contains(e.target))) dropdowns.forEach(menu=>menu.open=false);
+  });
+  window.addEventListener('resize',resize);
+
+  $('voiceSource').value='system';
+  resize();
+  loadVoices();
+  if('speechSynthesis' in window) window.speechSynthesis.onvoiceschanged=loadVoices;
+  renderChips();
+  heats=Number($('heatsSelect').value);
+  baseSeed=`preview-${Date.now()}`;
+  buildHeat();
+  updateScores();
+  requestAnimationFrame(frame);
+})();

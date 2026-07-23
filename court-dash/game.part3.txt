@@ -1,0 +1,239 @@
+);
+    tone(520,.1,'square',.1);
+    const timer=setInterval(()=>{
+      if(token!==raceToken){clearInterval(timer);return}
+      n--;
+      if(n>0){
+        countdownEl.textContent=n;
+        tone(520+n*100,.1,'square',.1);
+      }else{
+        clearInterval(timer);
+        countdownEl.textContent='GO!';
+        tone(1020,.3,'sawtooth',.15,440);
+        setCrowd(.035,.35);
+        announce('They are loose!','And they are off!',{priority:10,flush:true,clipKey:'start'});
+        state='racing';
+        setTimeout(()=>countdownEl.classList.remove('show'),420);
+      }
+    },700);
+  }
+
+  function finishHeat(winner){
+    if(state!=='racing') return;
+    state='post';
+    winner.finished=true;
+    const winningTime=raceElapsed;
+    scores[winner.index]=(scores[winner.index]||0)+1;
+    (winningTimes[winner.index] ||= []).push(winningTime);
+    heatResults.push({heat:heatIndex,index:winner.index,time:winningTime});
+    spawnConfetti(finishX,winner.y,220,winner.color);
+    cheer();
+    announce(`${winner.name} wins heat ${heatIndex+1} in ${winningTime.toFixed(2)} seconds!`,`${winner.name} takes the tape!`,{priority:12,flush:true,clipKey:'finish'});
+    updateScores();
+
+    const needed=Math.floor(heats/2)+1;
+    const majorityWinner=choices.findIndex((_,i)=>(scores[i]||0)>=needed);
+    const finalHeat=heatIndex+1>=heats;
+    if(majorityWinner>=0 || finalHeat){
+      let finalIndex=majorityWinner;
+      championReason='';
+      if(finalIndex<0){
+        const result=resolveFinalWinner();
+        finalIndex=result.index;
+        championReason=result.tieBreak
+          ? `The heat wins were tied, so the fastest winning time of ${result.bestTime.toFixed(2)} seconds decided the champion.`
+          : `${choices[finalIndex]} earned the most heat wins.`;
+      }else{
+        championReason=`${choices[finalIndex]} reached ${needed} heat wins first.`;
+      }
+      const champ=racers.find(r=>r.index===finalIndex) || winner;
+      champ.x=Math.max(champ.x,finishX-70);
+      setTimeout(()=>showWinner(champ,championReason),900);
+    }else{
+      heatIndex++;
+      setTimeout(()=>{
+        buildHeat();
+        beginCountdown();
+      },2100);
+    }
+  }
+
+  function showWinner(champ,reason=''){
+    championRacer=champ;
+    championReason=reason || championReason;
+    if(!optionOn('feastToggle')){
+      finalizeWinner(champ);
+      return;
+    }
+    state='victory';
+    champ.victoryStart=worldTime;
+    champ.riderThrown=false;
+    champ.chomped=false;
+    champ.victoryShown=false;
+    announcerText.textContent=`${champ.name} rears up and locks eyes on the overconfident rider...`;
+    setCrowd(.22,.18);
+  }
+
+  function finalizeWinner(champ){
+    state='finished';
+    champ.victoryShown=true;
+    $('winnerName').textContent=champ.name;
+    const best=bestWinningTime(champ.index);
+    const timing=Number.isFinite(best)?` Fastest winning heat: ${best.toFixed(2)} seconds.`:'';
+    const riderLine=optionOn('feastToggle')?' Its rider was less fortunate.':' The rider survives to race another day.';
+    $('winnerSpecies').textContent=`${champ.species} rules the Court. ${championReason}${timing}${riderLine}`;
+    winnerCard.classList.add('show');
+    raceBtn.disabled=choices.length<2;
+    announce(`Champion: ${champ.name}`,`${champ.name} is the champion of the Court!`,{priority:15,flush:true,clipKey:'champion'});
+  }
+
+  function resetGame(){
+    raceToken++;
+    state='idle';
+    scores={};winningTimes={};heatResults=[];championReason='';heatIndex=0;cameraX=0;championRacer=null;
+    matchRoster=[];
+    stopSpeech();
+    winnerCard.classList.remove('show');
+    countdownEl.classList.remove('show');
+    baseSeed=`preview-${Date.now()}`;
+    buildHeat();
+    renderChips();
+    setCrowd(.0001,.2);
+    raceStatus.innerHTML=choices.length>=2?'Ready for a fresh kaiju draft':'Add 2–8 decisions<br>to summon the racers';
+    announce('The beasts await the signal.','The beasts await the signal.',{clipKey:'idle'});
+  }
+
+  function addChoices(){
+    const values=choiceInput.value.split(',').map(v=>v.trim()).filter(Boolean);
+    for(const v of values){
+      if(choices.length>=8) break;
+      if(!choices.some(c=>c.toLowerCase()===v.toLowerCase())) choices.push(v.slice(0,34));
+    }
+    choiceInput.value='';
+    resetGame();
+  }
+
+  function renderRosterReport(){
+    const report=$('rosterReport');
+    if(!report) return;
+    report.innerHTML='';
+    if(!choices.length){
+      report.innerHTML='<div class="roster-empty">Add at least two decisions. Kaiju are drafted when the match starts.</div>';
+      return;
+    }
+    if(matchRoster.length!==choices.length){
+      report.innerHTML='<div class="roster-empty">The roster is drawn fresh when you start the match, then stays locked for every heat in that set.</div>';
+      return;
+    }
+    choices.forEach((choice,i)=>{
+      const profile=matchRoster[i];
+      const card=document.createElement('div');card.className='roster-card';
+      const head=document.createElement('div');head.className='roster-head';
+      const choiceEl=document.createElement('strong');choiceEl.textContent=choice;
+      const speciesEl=document.createElement('span');speciesEl.textContent=profile.name;
+      head.append(choiceEl,speciesEl);card.appendChild(head);
+      const grid=document.createElement('div');grid.className='stat-grid';
+      statKeys.forEach(key=>{
+        const stat=document.createElement('div');stat.className='stat';
+        stat.innerHTML=`${statShort[key]}<b>${profile.stats[key]}</b><div class="stat-meter"><i style="width:${profile.stats[key]*10}%"></i></div>`;
+        grid.appendChild(stat);
+      });
+      card.appendChild(grid);report.appendChild(card);
+    });
+  }
+
+  function renderChips(){
+    $('chips').innerHTML='';
+    $('racerCount').textContent=choices.length;
+    choices.forEach((name,i)=>{
+      const chip=document.createElement('div');
+      chip.className='chip';
+      const label=matchRoster[i]?.name || 'Decision';
+      chip.innerHTML=`<strong>${label}</strong><span></span><button aria-label="Remove ${name}">×</button>`;
+      chip.querySelector('span').textContent=name;
+      chip.querySelector('button').onclick=()=>{choices.splice(i,1);resetGame()};
+      $('chips').appendChild(chip);
+    });
+    renderRosterReport();
+    raceBtn.disabled=choices.length<2 || state==='countdown' || state==='racing';
+  }
+
+  function update(dt){
+    worldTime+=dt;
+    if(state==='racing'){
+      raceElapsed+=dt;
+      let leader=racers[0];
+      for(const r of racers){
+        if(r.finished) continue;
+        if(r.slow>0) r.slow=Math.max(0,r.slow-dt);
+        if(r.stunned>0) r.stunned=Math.max(0,r.stunned-dt);
+
+        if(r.jumpY>0 || r.jumpV>0){
+          r.jumpY += r.jumpV*dt;
+          r.jumpV -= 980*dt;
+          if(r.jumpY<=0){r.jumpY=0;r.jumpV=0}
+        }
+
+        for(const h of hazards){
+          if(h.resolved || h.lane!==r.index || h.type!=='hurdle') continue;
+          const distance=h.x-r.x;
+          if(!h.triggered && distance>0 && distance<h.jumpLead && r.jumpY===0){
+            h.triggered=true;
+            r.jumpV=h.jumpVelocity;
+            tone(390,.08,'triangle',.055,620);
+            spawnBurst(r.x,r.y+30,'#bff8ff',12);
+          }
+        }
+
+        const surge=1+Math.sin(raceElapsed*1.9+r.phase)*.045+Math.sin(raceElapsed*.73+r.phase*2)*.025;
+        const handicap=r.slow>0?.45:r.stunned>0?.12:1;
+        const progress=clamp((r.x-startX)/(finishX-startX),0,1);
+        const fatigue=1-progress*clamp(.075-r.stats.endurance*.007,.008,.06);
+        r.x+=r.speed*r.energy*surge*handicap*fatigue*dt;
+        r.trail.push({x:r.x,y:r.y,life:.35});
+        if(r.trail.length>12) r.trail.shift();
+
+        for(const h of hazards){
+          if(h.resolved || h.lane!==r.index) continue;
+          if(Math.abs(r.x-h.x)<34){
+            if(h.type==='hurdle'){
+              h.resolved=true;
+              if(r.jumpY>h.height+3){
+                h.cleared=true;
+                tone(760,.06,'triangle',.035,920);
+              }else{
+                h.hit=true;h.broken=true;
+                const bruteChance=clamp(.05+r.stats.power*.075,.18,.80);
+                if(rng()<bruteChance){
+                  r.slow=Math.max(r.slow,.16);
+                  h.outcome='powers straight through the hurdle';
+                  tone(125,.13,'square',.09,72);
+                }else{
+                  r.stunned=clamp(.82-r.stats.power*.055,.24,.68);
+                  h.outcome='clips the hurdle and loses momentum';
+                  tone(100,.18,'square',.13,55);
+                }
+                spawnBurst(h.x,r.y,'#ff557f',40);
+                screenShake=Math.max(screenShake,10);
+                queueHazardAnnouncement(r,h);
+              }
+              continue;
+            }
+
+            h.resolved=true;h.hit=true;
+            if(h.type==='banana'){
+              const saveChance=clamp(.08+r.stats.traction*.065+r.stats.agility*.018,.24,.83);
+              if(rng()<saveChance){
+                r.slow=Math.max(r.slow,.16);h.outcome='keeps its footing on the banana peel';
+                tone(540,.08,'triangle',.04,760);spawnBurst(h.x,r.y,'#ffe66d',15);
+              }else{
+                r.slow=clamp(1.35-r.stats.traction*.075-r.stats.agility*.025,.38,1.12);
+                h.outcome='wipes out on a banana peel';slipSound();spawnBurst(h.x,r.y,'#ffd834',30);
+              }
+            }
+            if(h.type==='slime'){
+              r.slow=clamp(1.62-r.stats.traction*.06-r.stats.power*.035,.48,1.30);
+              h.outcome=r.slow<.7?'muscles through the Court slime':'gets bogged down in Court slime';
+              tone(180,.18,'triangle',.08,90);spawnBurst(h.x,r.y,'#2afadf',36);
+            }
+    

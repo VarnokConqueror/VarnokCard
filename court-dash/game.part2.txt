@@ -1,0 +1,256 @@
+f(!availableVoices.length){
+      const option=document.createElement('option');
+      option.value='__default__';
+      option.textContent='System default voice';
+      select.appendChild(option);
+      setVoiceStatus('Opera has not listed individual voices yet. Preview will use the Windows default voice.');
+      if(voiceLoadAttempts<12){ voiceLoadAttempts++; setTimeout(loadVoices,250); }
+      return;
+    }
+    voiceLoadAttempts=0;
+    for(const v of availableVoices){
+      const option=document.createElement('option');
+      option.value=voiceKey(v);
+      option.textContent=`${/Natural|Neural|Online/i.test(v.name)?'★ ':''}${v.name} (${v.lang})`;
+      select.appendChild(option);
+    }
+    const preferred=availableVoices.find(v=>voiceKey(v)===saved) || availableVoices[0];
+    if(preferred) select.value=voiceKey(preferred);
+    setVoiceStatus(`${availableVoices.length} voices found. Starred voices are usually the least robotic.`);
+  }
+
+  function selectedVoice(){
+    const id=$('voiceSelect').value;
+    return availableVoices.find(v=>voiceKey(v)===id) || availableVoices[0] || null;
+  }
+
+  function stopSpeech(){
+    speechGeneration++;
+    activeSpeechTicket++;
+    speechQueue=[];
+    speechActive=false;
+    activeSpeechKind=null;
+    hazardBatch=[];
+    hazardSpeechCooldownUntil=0;
+    clearTimeout(hazardBatchTimer);
+    hazardBatchTimer=0;
+    if(currentRecordedAudio){
+      currentRecordedAudio.pause();
+      currentRecordedAudio.currentTime=0;
+      currentRecordedAudio=null;
+    }
+    if('speechSynthesis' in window){
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.resume();
+    }
+  }
+
+  function queueSpeech(text,{priority=0,flush=false,kind='general',ttlMs=Infinity,replaceKind=false,clipKey=null}={}){
+    if(!optionOn('voiceToggle') || !text) return;
+    if($('voiceSource')?.value!=='recorded' && !('speechSynthesis' in window)) return;
+    if(flush) stopSpeech();
+    const now=performance.now();
+    if(replaceKind) speechQueue=speechQueue.filter(item=>item.kind!==kind);
+    speechQueue.push({
+      text,priority,kind,clipKey,generation:speechGeneration,
+      createdAt:now,
+      expiresAt:Number.isFinite(ttlMs)?now+ttlMs:Infinity
+    });
+    speechQueue.sort((a,b)=>b.priority-a.priority || a.createdAt-b.createdAt);
+    pumpSpeech();
+  }
+
+  function voiceProfile(){
+    return voiceProfiles[$('voicePace')?.value] || voiceProfiles.live;
+  }
+
+  function recordedClipFor(key){
+    if(!key) return null;
+    return recordedVoiceClips.get(key)
+      || (key.startsWith('hazard_') ? recordedVoiceClips.get('hazard') : null)
+      || (key==='preview' ? recordedVoiceClips.get('ready') : null)
+      || null;
+  }
+
+  function pumpSpeech(){
+    if(speechActive || !optionOn('voiceToggle')) return;
+    const now=performance.now();
+    let item=null;
+    while(speechQueue.length){
+      const candidate=speechQueue.shift();
+      if(candidate.generation!==speechGeneration || candidate.expiresAt<now) continue;
+      item=candidate;
+      break;
+    }
+    if(!item) return;
+
+    const ticket=++activeSpeechTicket;
+    speechActive=true;
+    activeSpeechKind=item.kind;
+    const done=()=>{
+      if(ticket!==activeSpeechTicket) return;
+      speechActive=false;
+      activeSpeechKind=null;
+      currentRecordedAudio=null;
+      const source=$('voiceSource')?.value;
+      if(source==='recorded') setVoiceStatus(`${recordedVoiceClips.size} recorded clips loaded.`);
+      else setVoiceStatus(availableVoices.length ? `${availableVoices.length} voices available.` : 'Using the Windows default voice.');
+      setTimeout(pumpSpeech,45);
+    };
+
+    if($('voiceSource')?.value==='recorded'){
+      const clip=recordedClipFor(item.clipKey);
+      if(clip){
+        const audio=new Audio(clip.url);
+        currentRecordedAudio=audio;
+        audio.playbackRate=voiceProfile().audioRate;
+        audio.volume=1;
+        audio.onended=done;
+        audio.onerror=done;
+        setVoiceStatus(`Playing your ${item.clipKey || 'announcer'} recording…`);
+        audio.play().catch(done);
+        return;
+      }
+      setVoiceStatus(`Missing recorded clip “${item.clipKey || 'general'}”; using the system voice.`);
+    }
+
+    if(!('speechSynthesis' in window)){ done(); return; }
+    const synth=window.speechSynthesis;
+    const u=new SpeechSynthesisUtterance(item.text);
+    const voice=selectedVoice();
+    const profile=voiceProfile();
+    if(voice) u.voice=voice;
+    u.rate=profile.rate;
+    u.pitch=profile.pitch;
+    u.volume=1;
+    u.onstart=()=>setVoiceStatus(`Speaking with ${voice ? voice.name : 'the Windows default voice'}…`);
+    u.onend=done;
+    u.onerror=e=>{
+      if(!['canceled','interrupted'].includes(e.error || '')){
+        setVoiceStatus(`Voice could not play${e.error ? `: ${e.error}` : '.'}`);
+      }
+      done();
+    };
+    synth.resume();
+    synth.speak(u);
+    setTimeout(()=>{ if(ticket===activeSpeechTicket) synth.resume(); },120);
+  }
+
+  function announce(text,spoken=text,options={}){
+    announcerText.textContent=text;
+    queueSpeech(spoken,options);
+  }
+
+  function hazardAction(event){
+    if(event.outcome) return event.outcome;
+    if(event.type==='banana') return 'wipes out on a banana peel';
+    if(event.type==='slime') return 'gets swallowed by Court slime';
+    if(event.type==='crate') return 'smashes into a crate';
+    return 'clips the neon hurdle';
+  }
+
+  function flushHazardBatch(){
+    hazardBatchTimer=0;
+    const events=hazardBatch.splice(0);
+    if(!events.length) return;
+
+    const names=[...new Set(events.map(e=>e.name))];
+    const now=performance.now();
+    let hud,spoken;
+    if(events.length===1){
+      hud=`${events[0].name} ${hazardAction(events[0])}!`;
+      spoken=hud;
+    }else{
+      hud=`Track chaos: ${names.slice(0,3).join(', ')} hit hazards!`;
+      spoken=names.length===2
+        ? `${names[0]} and ${names[1]} both hit trouble on the track.`
+        : `Multiple kaiju hit hazards. The Court is in chaos.`;
+    }
+    announcerText.textContent=hud;
+
+    // One summary covers the entire burst. Events during cooldown remain visual only.
+    if(now<hazardSpeechCooldownUntil) return;
+    const ttlMs=events.length>1?1700:1100;
+    const clipKey=events.length>1?'hazard_chaos':`hazard_${events[0].type}`;
+    queueSpeech(spoken,{priority:1,kind:'hazard',ttlMs,replaceKind:true,clipKey});
+    hazardSpeechCooldownUntil=now+(events.length>1?3800:2300);
+  }
+
+  function queueHazardAnnouncement(r,h){
+    hazardBatch.push({name:r.name,type:h.type,outcome:h.outcome,at:performance.now()});
+    announcerText.textContent=`${r.name} ${hazardAction(h)}!`;
+    // Start one short collection window. New hits join it instead of postponing it forever.
+    if(!hazardBatchTimer) hazardBatchTimer=setTimeout(flushHazardBatch,480);
+  }
+
+  function kaijuType(i){ return matchRoster[i]?.type ?? (i % 8); }
+  function createRacer(name,i,laneY,profile){
+    const stats={...profile.stats};
+    return {
+      name,index:i,type:profile.type,species:profile.name,profile,stats,
+      color:profile.color,x:startX,y:laneY,
+      speed:226+stats.speed*5.1,energy:rand(.985,1.015),phase:rand(0,Math.PI*2),
+      agility:stats.agility,jumpY:0,jumpV:0,
+      slow:0,stunned:0,finished:false,place:0,trail:[],
+      victoryStart:-1,riderThrown:false,chomped:false,victoryShown:false
+    };
+  }
+
+  function buildHeat(){
+    const seedText = `${baseSeed}|heat:${heatIndex}|match:${matchSerial}`;
+    rng = makeRng(seedText);
+    const top = 170;
+    const bottom = viewportH-126;
+    const gap = choices.length>1 ? (bottom-top)/(choices.length-1) : 0;
+    if(matchRoster.length!==choices.length){
+      racers=[];hazards=[];particles=[];cameraX=0;raceElapsed=0;championRacer=null;updateScores();return;
+    }
+    racers = choices.map((name,i)=>createRacer(name,i,top+gap*i,matchRoster[i]));
+    hazards = [];
+    championRacer = null;
+    if(optionOn('hazardsToggle')){
+      racers.forEach((r,i)=>{
+        const count = choices.length>6 ? 1 : 2;
+        const slots = [840,1420,2050,2570];
+        for(let h=0;h<count;h++){
+          const typeRoll=rng();
+          const type=typeRoll<.28?'banana':typeRoll<.51?'slime':typeRoll<.72?'crate':'hurdle';
+          const hurdleChance=clamp(.30+r.stats.agility*.065+r.stats.speed*.012,.46,.94);
+          const willClear=type==='hurdle' ? rng()<hurdleChance : false;
+          hazards.push({
+            x:slots[(i+h*2)%slots.length]+rand(-125,125),
+            lane:i,type,hit:false,resolved:false,triggered:false,cleared:false,broken:false,outcome:'',
+            height:type==='hurdle'?rand(32,43):0,
+            jumpLead:type==='hurdle'?86+r.stats.agility*9+rand(-10,14):0,
+            jumpVelocity:type==='hurdle'?(willClear?430+r.stats.agility*17+rand(-16,22):300+r.stats.agility*8+rand(-18,12)):0,
+            willClear,variant:Math.floor(rand(0,3))
+          });
+        }
+      });
+    }
+    particles=[];
+    cameraX=0;
+    raceElapsed=0;
+    updateScores();
+  }
+
+  function startMatch(){
+    if(choices.length<2 || state==='countdown' || state==='racing') return;
+    heats=Number($('heatsSelect').value);
+    heatIndex=0;scores={};winningTimes={};heatResults=[];championReason='';matchSerial++;
+    baseSeed=$('seedInput').value.trim() || `court-${Date.now()}-${Math.random()}`;
+    draftMatchRoster();
+    renderChips();
+    winnerCard.classList.remove('show');
+    buildHeat();
+    beginCountdown();
+  }
+
+  function beginCountdown(){
+    const token=++raceToken;
+    state='countdown';
+    raceBtn.disabled=true;
+    let n=3;
+    announce('Racers to the line.','Racers to the line.',{priority:10,flush:true,clipKey:'ready'});
+    countdownEl.textContent=n;
+    countdownEl.classList.add('show'
